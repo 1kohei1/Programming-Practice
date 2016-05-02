@@ -1,88 +1,73 @@
 import java.util.Scanner;
 
-// uva 10855
+// uva 10920
 
 public class Main {
 
-	static int n1;
-	static int n2;
-	
-	static char[][] bigger;
-	static char[][] smaller;
-	
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
 		
 		while(true) {
-			n1 = in.nextInt();
-			if (n1 == 0) {
+			int n = in.nextInt();
+			if (n == 0) {
 				break;
 			}
-			n2 = in.nextInt();
+			int p = in.nextInt();
 			
-			bigger = new char[n1][n1];
-			smaller = new char[n2][n2];
-			
-			for (int i = 0; i < n1; i++) {
-				bigger[i] = in.next().toCharArray();
-			}
-			for (int i = 0; i < n2; i++) {
-				smaller[i] = in.next().toCharArray();
+			if (p == 1) {
+				printAnswer((n + 1) / 2, (n + 1) / 2);
+				continue;
 			}
 			
-			for (int i = 0; i < 4; i++) {
-				System.out.printf("%d%s", count(), i == 3 ? "" : " ");
-				rotate();
-			}
-			System.out.println();
-		}
-	}
-	
-	// Return how many it has
-	public static int count() {
-		int count = 0;
-		
-		for (int i = 0; i <= n1 - n2; i++) {
-			for (int j = 0; j <= n1 - n2; j++) {
-				boolean isFound = true;
-				for (int k = 0; k < n2 && isFound; k++) {
-					for (int l = 0; l < n2 && isFound; l++) {
-						if (smaller[k][l] != bigger[i + k][j + l]) {
-							isFound = false;
-						}
-					}
-				}
-				if (isFound) {
-					count++;
+			int num = 0;
+			boolean answerFound = false;
+			
+			for (int i = 1; i <= n; i += 2) {
+				if (i * i == p) {
+					int a = (n + 1) / 2 + i / 2;
+					printAnswer(a, a);
+					answerFound = true;
+				} else if (p < i * i) {
+					num = i - 2;
+					break;
 				}
 			}
-		}
-		
-		return count;
-	}
-	
-	// Rotate 90 degree
-	public static void rotate() {
-		// move first col to first row,
-		// move second col to second row,
-		// move thrid col to third row
-		
-		char[][] newSmaller = new char[n2][n2];
-		for (int i = 0; i < n2; i++) {
-			for (int j = n2 - 1; j >= 0; j--) {
-				newSmaller[i][n2 - 1 - j] = smaller[j][i];
+//			System.out.println("num: " + num);
+			
+			if (answerFound) {
+				continue;
+			}
+			
+			// If it's in row above
+			if (num * num < p && p <= num * num + (1 + num)) {
+				int diff = num * num + 1 - p;
+				int row = (n + 1) / 2 + num / 2 + 1;
+				int col = (n + 1) / 2 + num / 2 + diff;
+				printAnswer(row, col);
+			}
+			// If it's in left column
+			else if (num * num + (1 + num) < p && p <= num * num + 2 * (1 + num)) {
+				int diff = num * num + (1 + num) - p;
+				int row = (n + 1) / 2 + num / 2 + 1 + diff;
+				int col = (n + 1) / 2 + num / 2 - num;
+				printAnswer(row, col);
+			}
+			// If it's in bottom row
+			else if (num * num + 2 * (1 + num) < p && p <= num * num + 3 * (1 + num)) {
+				int diff = num * num + 2 * (1 + num) - p;
+				int row = (n + 1) / 2 + num / 2 - num;
+				int col = (n + 1) / 2 + num / 2 - num - diff;
+				printAnswer(row, col);
+			} else {
+				int diff = (num + 2) * (num + 2) - p;
+				int row = (n + 1) / 2 + num / 2 + 1 - diff;
+				int col = (n + 1) / 2 + num / 2 + 1;
+				printAnswer(row, col);
 			}
 		}
-		smaller = newSmaller;
 	}
 	
-	public static void printArray(char[][] c) {
-		for (int i = 0; i < c.length; i++) {
-			for (int j = 0; j < c[i].length; j++) {
-				System.out.print(c[i][j]);
-			}
-			System.out.println();
-		}
+	public static void printAnswer(int a, int b) {
+		System.out.printf("Line = %d, column = %d.\n", a, b);
 	}
-	
 }
