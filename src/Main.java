@@ -6,67 +6,50 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.TreeSet;
 
+// uva 12356
+
 public class Main {
 
-	public static void main(String[] args) throws NumberFormatException, IOException {
-		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+	public static void main(String[] args) {
+		Scanner in = new Scanner(System.in);
 		
-		String s = in.readLine();
-		
-		while (s.length() > 0) {
-			
-			int[] nums = breakS(s);
-			int numSoldiers = nums[0];
-			int numReports = nums[1];
-			
-			if (numSoldiers == 0 && numReports == 0) {
+		while (true) {
+			int numSoldiers = in.nextInt();
+			if (numSoldiers == 0) {
 				break;
 			}
+			int numReports = in.nextInt();
 			
-			TreeSet<Integer> trees = new TreeSet<Integer>();
+			TreeSet<Integer> tree = new TreeSet<Integer>();
 			for (int i = 1; i <= numSoldiers; i++) {
-				trees.add(i);
+				tree.add(i);
 			}
 			
 			for (int i = 0; i < numReports; i++) {
-				nums = breakS(in.readLine());
-				int leftIndex = nums[0];
-				int rightIndex = nums[1];
+				int left = in.nextInt();
+				int right = in.nextInt();
 				
-				for (int j = leftIndex; j <= rightIndex; j++) {
-					trees.remove(j);
+				for (int j = left; j <= right; j++) {
+					tree.remove(j);
 				}
 				
-				int nextLeft = 0;
-				int nextRight = 0;
+				int answerLeft = 0;
+				int answerRight = 0;
 				
-				if (trees.lower(leftIndex) == null) {
-					nextLeft = -1;
+				if (tree.lower(left) == null) {
+					answerLeft = -1;
 				} else {
-					nextLeft = trees.lower(leftIndex);
+					answerLeft = tree.lower(left);
 				}
 				
-				if (trees.higher(rightIndex) == null) {
-					nextRight = -1;
+				if (tree.higher(right) == null) {
+					answerRight = -1;
 				} else {
-					nextRight = trees.higher(rightIndex);
+					answerRight = tree.higher(right);
 				}
-				
-				System.out.println((nextLeft == -1 ? "*" : nextLeft) + " " + (nextRight == -1? "*" : nextRight));
-
+				System.out.println((answerLeft == -1 ? "*" : answerLeft) + " " + (answerRight == -1 ? "*" : answerRight));
 			}
 			System.out.println("-");
-			s = in.readLine();			
 		}
-	}
-	
-	public static int[] breakS(String s) {
-		String[] sArray = s.split(" ");
-		int[] nums = new int[2];
-		
-		nums[0] = Integer.parseInt(sArray[0]);
-		nums[1] = Integer.parseInt(sArray[1]);
-		
-		return nums;
 	}
 }
