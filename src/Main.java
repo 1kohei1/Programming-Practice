@@ -1,54 +1,53 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.TreeSet;
 
-// uva 11286
+// uva 11572
 
 public class Main {
 
 	public static void main(String[] args) throws NumberFormatException, IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
-		int n = Integer.parseInt(in.readLine());
+		int nt = Integer.parseInt(in.readLine());
 		
-		while (n != 0) {
-			HashMap<TreeSet<Integer>, Integer> map = new HashMap<TreeSet<Integer>, Integer>();
+		for (int counter = 0; counter < nt; counter++) {
+			int n = Integer.parseInt(in.readLine());
 			
-			int[] answer = new int[n + 1];
-			
+			int[] nums = new int[n];
 			for (int i = 0; i < n; i++) {
-				String s = in.readLine();
-				String[] sArray = s.split(" ");
+				nums[i] = Integer.parseInt(in.readLine());
+			}
+			
+			ArrayList<Integer> nums1 = new ArrayList<Integer>();
+			nums1.add(0);
+			
+			int answer = 0;
+			
+			while (nums1.size() > 0) {
+				int index = nums1.remove(0);
 				
-				TreeSet<Integer> nums = new TreeSet<Integer>();
-				for (int j = 0; j < 5; j++) {
-					nums.add(Integer.parseInt(sArray[j]));
+				HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
+				int count = 0;
+				
+				for (int i = index; i < n; i++) {
+					if (map.containsKey(nums[i])) {
+						nums1.add(map.get(nums[i]) + 1);
+						break;
+					} else {
+						map.put(nums[i], i);
+					}
+					count++;
 				}
 				
-				if (map.containsKey(nums)) {
-					int prePopularity = map.get(nums);
-					answer[prePopularity] -= prePopularity;
-					
-					int popularity = prePopularity + 1;
-					
-					map.put(nums, popularity);
-					answer[popularity] += popularity;
-				} else {
-					map.put(nums, 1);
-					answer[1]++;
+				if (count > answer) {
+					answer = count;
 				}
 			}
 			
-			for (int i = n; i >= 0; i--) {
-				if (answer[i] != 0) {
-					System.out.println(answer[i]);
-					break;
-				}
-			}
-			
-			n = Integer.parseInt(in.readLine());
+			System.out.println(answer);
 		}
 	}
 	
