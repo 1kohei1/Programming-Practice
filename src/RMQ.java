@@ -63,42 +63,33 @@ public class RMQ {
 	}
 	
 	public static int getMinimumIndexInRange(int indexRangeStart, int indexRangeEnd, int index, int rangeStart, int rangeEnd) {
-		// If given range only contains one element in the range
-		if (rangeStart == rangeEnd) {
-			return rangeStart;
+		// Out of requested range
+		if (rangeEnd < indexRangeStart || indexRangeEnd < rangeStart) {
+			return -1;
 		}
-		// If given range fits in the range rmq array stores
-		if (indexRangeStart == rangeStart && indexRangeEnd == rangeEnd) {
+		// index range is in the requested range.
+		if (rangeStart <= indexRangeStart && indexRangeEnd <= rangeEnd) {
 			return rmq[index];
 		}
-		// If it reaches single range
-		if (indexRangeStart == indexRangeEnd) {
-			return indexRangeStart;
-		}
-		
+
 		int leftRangeEnd = (indexRangeStart + indexRangeEnd) / 2;
 		int rightRangeStart = (indexRangeStart + indexRangeEnd) / 2 + 1;
+
+		int left = getMinimumIndexInRange(indexRangeStart, leftRangeEnd, 2 * index, rangeStart, rangeEnd);
+		int right = getMinimumIndexInRange(rightRangeStart, indexRangeEnd, 2 * index + 1, rangeStart, rangeEnd);
 		
-		// If rangeEnd is in left side, only look into left node
-		if (rangeEnd <= leftRangeEnd) {
-			return getMinimumIndexInRange(indexRangeStart, leftRangeEnd, 2 * index, rangeStart, rangeEnd);
-		}
-		// If rangeStart is in right side, only look into right node
-		else if (rightRangeStart <= indexRangeStart) {
-			return getMinimumIndexInRange(rightRangeStart, indexRangeEnd, 2 * index + 1, rangeStart, rangeEnd);
-		}
-		// If range is in both side, look into both nodes
-		else {
-			int left = getMinimumIndexInRange(indexRangeStart, leftRangeEnd, 2 * index, rangeStart, leftRangeEnd);
-			int right = getMinimumIndexInRange(rightRangeStart, indexRangeEnd, 2 * index + 1, rightRangeStart, rangeEnd);
-			
+		if (left == -1) {
+			return right;
+		} else if (right == -1) {
+			return left;
+		} else {
 			if (nums[left] > nums[right]) {
 				return right;
 			} else {
 				return left;
 			}
 		}
-}
+	}
 	
 	public static void printRMQ() {
 		for (int i = 0; i < rmq.length; i++) {
@@ -106,5 +97,9 @@ public class RMQ {
 		}
 		System.out.println();
 	}
+/*
+7
+18 17 13 19 15 11 20
 	
+ */
 }
