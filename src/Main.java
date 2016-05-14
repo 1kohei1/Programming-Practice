@@ -1,124 +1,73 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.util.TreeSet;
 
-// uva 10895
+// uva 725
 
 public class Main {
 
 	public static void main(String[] args) throws NumberFormatException, IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+
+		int n = Integer.parseInt(in.readLine());
+		boolean isFirst = true;
 		
-		String s1;
-		while((s1 = in.readLine()) != null) {
-			String[] s1Array = s1.split(" ");
+		while (n != 0) {
 			
-			int row = Integer.parseInt(s1Array[0]);
-			int col = Integer.parseInt(s1Array[1]);
-			
-			ArrayList[] answer = new ArrayList[col];
-			for (int i = 0; i < col; i++) {
-				answer[i] = new ArrayList<Element>();
+			if (!isFirst) {
+				System.out.println();
 			}
 			
-			for (int i = 0; i < row; i++) {
-				// First line
-				String s2 = in.readLine();
-				String[] s2Array = s2.split(" ");
+			int count = 0;
+			for (int fghij = 1234; fghij * n < 100000; fghij++) {
+				int abcde = fghij * n;
 				
-				int r = convert(s2Array[0]);
-				int[] cols = new int[r];
-				
-				for (int j = 0; j < r; j++) {
-					cols[j] = convert(s2Array[j + 1]);
-				}
-				
-				// Second line
-				String s3 = in.readLine();
-				String[] s3Array = s3.split(" ");
-				
-				for (int j = 0; j < r; j++) {
-					Element e = new Element(i + 1, convert(s3Array[j]));
-					answer[cols[j] - 1].add(e);
+				if (all0to9(abcde, fghij)) {
+					count++;
+					System.out.printf("%d / %s%d = %d\n", abcde, fghij < 10000 ? "0" : "", fghij, n);
 				}
 			}
 			
-			System.out.printf("%d %d\n", col, row);
+			if (count == 0) {
+				System.out.printf("There are no solutions for %d.\n", n);
+			}
 			
-			for (int i = 0; i < col; i++) {
-				ArrayList<Element> e = answer[i];
-				int size = e.size();
-				String line1 = "";
-				String line2 = "";
-				
-				for (int j = 0; j < size; j++) {
-					line1 += e.get(j).col;
-					line2 += e.get(j).val;
-					
-					if (j != size - 1) {
-						line1 += " ";
-						line2 += " ";
-					}
-				}
-				
-				if (size == 0) {
-					System.out.println(size);
-					System.out.println();
-				} else {
-					System.out.println(size + " " + line1);
-					System.out.println(line2);
-				}
-			}
-		}
-		in.close();
-	}
-/*
-4 3
-3 1 2 3
-1 3 2
-2 2 3
-4 -1
-0
-
-3 1 2 3
-5 -2 11
- */
-	
-	public static void printStringArray(String[] s) {
-		for (int i = 0; i < s.length; i++) {
-			System.out.printf("%s ", s[i]);
-		}
-		System.out.println();
-	}
-	
-	public static void printAnswer(ArrayList[] answer) {
-		for (int i = 0; i < answer.length; i++) {
-			System.out.printf("row %d: ", i);
-			for (int j = 0; j < answer[i].size(); j++) {
-				Element e = ((Element) answer[i].get(j));
-				System.out.printf("(col: %d, val: %d) ", e.col, e.val);
-			}
-			System.out.println();
+			n = Integer.parseInt(in.readLine());
+			isFirst = false;
 		}
 	}
-	
-	public static int convert(String s) {
-		return Integer.parseInt(s);
-	}
-}
 
-class Element implements Comparable<Element> {
-	public int col;
-	public int val;
-	
-	public Element(int c, int v) {
-		col = c;
-		val = v;
-	}
-
-	@Override
-	public int compareTo(Element o) {
-		return this.col - o.col;
+	public static boolean all0to9(int abcde, int fghij) {
+		TreeSet<Integer> nums = new TreeSet<Integer>();
+		
+		if (abcde < 10000 && fghij < 10000) {
+			return false;
+		}
+		if (fghij < 10000) {
+			nums.add(0);
+		}
+		
+		while (fghij > 0) {
+			int onethDigit = fghij % 10;
+			if (nums.contains(onethDigit)) {
+				return false;
+			} else {
+				nums.add(onethDigit);
+			}
+			fghij /= 10;
+		}
+		
+		while (abcde > 0) {
+			int onethDigit = abcde % 10;
+			if (nums.contains(onethDigit)) {
+				return false;
+			} else {
+				nums.add(onethDigit);
+			}
+			abcde /= 10;
+		}
+		
+		return true;
 	}
 }
