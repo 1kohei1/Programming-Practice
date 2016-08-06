@@ -1,83 +1,76 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.PriorityQueue;
+import java.util.Scanner;
+import java.util.Set;
 
-// uva 10660
+// uva 1047
 
 public class Main {
 	
-	static int distance;
-	static Area[] area;
-	static int[] solution;
+	static int n;
+	static int m;
+	static int[] nums;
+	
+	static HashMap<Integer, Integer> intersections;
+	
+	public static void main(String[] args) {
+		Scanner in = new Scanner(System.in);
 
-	public static void main(String[] args) throws NumberFormatException, IOException {
-		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-
-		int nt = to(in.readLine());
-		while (nt-- > 0) {
-			int n = to(in.readLine());
-			Area[] area = new Area[n];
+		int counter = 1;
+		n = in.nextInt();
+		m = in.nextInt();
+		
+		while (n != 0 && m != 0) {
+			nums = new int[n];
+			intersections = new HashMap<Integer, Integer>();
 			
 			for (int i = 0; i < n; i++) {
-				String[] s = in.readLine().split(" ");
-				int row = to(s[0]);
-				int col = to(s[1]);
-				int numPeople = to(s[2]);
-				
-				area[i] = new Area(row, col, numPeople);
+				nums[i] = in.nextInt();
 			}
 			
-			int[] solution = new int[5];
-			int distance = Integer.MAX_VALUE;
+			int a = in.nextInt();
+			for (int i = 0; i < a; i++) {
+				int t = in.nextInt();
+				
+				int key = 0;
+				for (int j = 0; j < t; j++) {
+					key |= 1 << (in.nextInt() - 1);
+				}
+				
+				int numPeople = in.nextInt();
+				intersections.put(key, numPeople);
+			}
 			
-			for (int a = 0; a < 25; a++) {
-				for (int b = a + 1; b < 25; b++) {
-					for (int c = b + 1; c < 25; c++) {
-						for (int d = c + 1; d < 25; d++) {
-							for (int e = d + 1; e < 25; e++) {
-								int dist = 0;
-								
-								for (int i = 0; i < n; i++) {
-									int officeD = Integer.MAX_VALUE;
-									officeD = Math.min(officeD, Math.abs(a / 5 - area[i].row) + Math.abs(a % 5 - area[i].col));
-									officeD = Math.min(officeD, Math.abs(b / 5 - area[i].row) + Math.abs(b % 5 - area[i].col));
-									officeD = Math.min(officeD, Math.abs(c / 5 - area[i].row) + Math.abs(c % 5 - area[i].col));
-									officeD = Math.min(officeD, Math.abs(d / 5 - area[i].row) + Math.abs(d % 5 - area[i].col));
-									officeD = Math.min(officeD, Math.abs(e / 5 - area[i].row) + Math.abs(e % 5 - area[i].col));
-									dist += officeD * area[i].numPeople;
-								}
-								
-								if (dist < distance) {
-									distance = dist;
-									solution = new int[]{a, b, c, d, e};
-								}
-							}
-						}
+			// Try all possible combinations
+			for (int i = 1; i < 1 << n; i++) {
+				int count = 0;
+				for (int j = 0; j < n; j++) {
+					if ((i & (1 << j)) != 0) {
+						count++;
+					}
+					if (count > m) {
+						break;
 					}
 				}
+				
+				if (count != m) {
+					continue;
+				}
+				
+				int totalPeople = 0;
+				for (int j = 0; j < n; j++) {
+					if ((i & (1 << j)) != 0) {
+						totalPeople += nums[j];
+					}
+				}
+				
+				// Then, subtract number that overlaps.
+				
 			}
 			
-			for (int i = 0; i < 5; i++) {
-				System.out.printf("%d%s", solution[i], i == 4 ? "" : " ");
-			}
-			System.out.println();
+			counter++;
+			n = in.nextInt();
+			m = in.nextInt();
 		}
-	}
-	
-	public static int to(String s) {
-		return Integer.parseInt(s);
-	}
-}
-
-class Area {
-	int row;
-	int col;
-	int numPeople;
-	
-	public Area(int r, int c, int n) {
-		row = r;
-		col = c;
-		numPeople = n;
 	}
 }
