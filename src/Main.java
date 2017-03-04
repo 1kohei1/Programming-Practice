@@ -1,76 +1,60 @@
-import java.util.HashMap;
-import java.util.PriorityQueue;
 import java.util.Scanner;
-import java.util.Set;
 
-// uva 1047
+// uva 459
 
 public class Main {
 	
-	static int n;
-	static int m;
-	static int[] nums;
-	
-	static HashMap<Integer, Integer> intersections;
+	static int[][] map;
+	static int[] visited;
 	
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
-
-		int counter = 1;
-		n = in.nextInt();
-		m = in.nextInt();
 		
-		while (n != 0 && m != 0) {
-			nums = new int[n];
-			intersections = new HashMap<Integer, Integer>();
+		int numTests = in.nextInt();
+		String s;
+		while (numTests-- > 0) {
+			int numNodes = in.next().charAt(0) - 'A' + 1;
+			in.nextLine();
+			visited = new int[numNodes];
+			map = new int[numNodes][numNodes];
 			
-			for (int i = 0; i < n; i++) {
-				nums[i] = in.nextInt();
+			s = in.nextLine();
+			while (s.length() != 0) {
+				int a = s.charAt(0) - 'A';
+				int b = s.charAt(1) - 'A';
+				map[a][b] = 1;
+				map[b][a] = 1;
+				if (in.hasNextLine()) {
+					s = in.nextLine();
+				} else {
+					break;
+				}
 			}
-			
-			int a = in.nextInt();
-			for (int i = 0; i < a; i++) {
-				int t = in.nextInt();
-				
-				int key = 0;
-				for (int j = 0; j < t; j++) {
-					key |= 1 << (in.nextInt() - 1);
+						
+			int answer = 0;
+			for (int i = 0; i < numNodes; i++) {
+				if (visited[i] == 0) {
+					solve(i);
+					answer++;
 				}
-				
-				int numPeople = in.nextInt();
-				intersections.put(key, numPeople);
 			}
-			
-			// Try all possible combinations
-			for (int i = 1; i < 1 << n; i++) {
-				int count = 0;
-				for (int j = 0; j < n; j++) {
-					if ((i & (1 << j)) != 0) {
-						count++;
-					}
-					if (count > m) {
-						break;
-					}
-				}
-				
-				if (count != m) {
-					continue;
-				}
-				
-				int totalPeople = 0;
-				for (int j = 0; j < n; j++) {
-					if ((i & (1 << j)) != 0) {
-						totalPeople += nums[j];
-					}
-				}
-				
-				// Then, subtract number that overlaps.
-				
+			System.out.println(answer);
+			if (numTests > 0) {
+				System.out.println();
 			}
-			
-			counter++;
-			n = in.nextInt();
-			m = in.nextInt();
+		}
+	}
+
+	public static void solve(int start) {
+		if (visited[start] == 1) {
+			return;
+		}
+		visited[start] = 1;
+		
+		for (int i = 0; i < map.length; i++) {
+			if (map[start][i] == 1 && visited[i] == 0) {
+				solve(i);
+			}
 		}
 	}
 }
