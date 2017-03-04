@@ -1,85 +1,91 @@
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.PriorityQueue;
 
-// uva 469
+// uva 11060
 
 public class Main {
-	
-	static char[][] map;
-	static int[][] visited;
-	static int[] dx = new int[]{-1, 0, 1, -1, 1, -1, 0, 1};
-	static int[] dy = new int[]{-1, -1, -1, 0, 0, 1, 1, 1};
+
+	static HashMap<String, Drink> map;
 	
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
 	
-		int numTests = in.nextInt();
-		in.nextLine();
-		in.nextLine();
-		ArrayList<String> temp = new ArrayList<String>();
-		while (numTests-- > 0) {
-			temp.clear();
-			
-			int numRows = 0;
-			int numCols = 0;
-			
-			String line = in.nextLine();
-			// Get map info
-			while (line.charAt(0) == 'L' || line.charAt(0) == 'W') {
-				temp.add(line);
-				numRows++;
-				numCols = line.length();
-				line = in.nextLine();
+		HashMap<String, Drink> map = new HashMap<String, Drink>();
+		PriorityQueue<Drink> pq = new PriorityQueue<Drink>();
+		int numTest = 1;
+		
+		while (in.hasNext()) {
+			int n = in.nextInt();
+			for (int i = 0; i < n; i++) {
+				String s = in.next();
+				Drink d = new Drink(s, i);
+				map.put(s, d);
+				pq.add(d);
 			}
 			
-//			System.out.printf("numRows: %d, numCols: %d\n", numRows, numCols);
-			
-			// Create map
-			map = new char[numRows][numCols];
-			visited = new int[numRows][numCols];
-			for (int i = 0; i < numRows; i++) {
-				map[i] = temp.get(i).toCharArray();
+			int m = in.nextInt();
+			for (int i = 0; i < m; i++) {
+				String s1 = in.next();
+				String s2 = in.next();
+				
+				// Update connectingTo
+				Drink d;
+				d = map.get(s1);
+				d.connectingTo.add(s2);
+				
+				d = map.get(s2);
+				pq.remove(d);
+				d.numConnected++;
+				pq.add(d);
 			}
 			
-			// Get cell info
-			while (true) {
-				String[] array = line.split(" ");
-				int r = new Integer(array[0]) - 1;
-				int c = new Integer(array[1]) - 1;
-				System.out.println(count(r, c));
-				for (int i = 0; i < numRows; i++) {
-					Arrays.fill(visited[i], 0);;
+			// Output
+			System.out.printf("Case #%d: Dilbert should drink beverages in this order:", numTest);
+			while (pq.size() > 0) {
+				Drink d = pq.remove();
+				if (d.numConnected != 0) {
+					System.out.println("Something is wrong\n");
+					return;
 				}
-				if (in.hasNext()) {
-					line = in.nextLine();
-				} else {
-					break;
+				
+				for (int i = 0; i < d.connectingTo.size(); i++) {
+					Drink dd = map.get(d.connectingTo.get(i));
+					pq.remove(dd);
+					dd.numConnected--;
+					pq.add(dd);
 				}
-				if (line.length() == 0) break;
+				System.out.printf(" %s", d.name);
 			}
-			
-			if (numTests > 0) {
-				System.out.println();
-			}
+			System.out.println(".\n");
+			numTest++;
+		}
+	}
+}
+
+class Drink implements Comparable<Drink> {
+
+	int order;
+	String name;
+	ArrayList<String> connectingTo;
+	int numConnected;
+	
+	public Drink(String name, int order) {
+		this.order = order;
+		this.name = name;
+		this.connectingTo = new ArrayList<String>();
+		this.numConnected = 0;
+	}
+	
+	@Override
+	public int compareTo(Drink o) {
+		if (this.numConnected - o.numConnected != 0) {
+			return this.numConnected - o.numConnected;
+		} else {
+			return this.order - o.order;
 		}
 	}
 	
-	public static int count(int r, int c) {
-		if (visited[r][c] == 1) {
-			return 0;
-		}
-		int answer = 1;
-		visited[r][c] = 1;
-		
-		for (int i = 0; i < dx.length; i++) {
-			int newR = r + dx[i];
-			int newC = c + dy[i];
-			if (0 <= newR && newR < visited.length && 0 <= newC && newC < visited[0].length && map[newR][newC] == 'W') {
-				answer += count(newR, newC);
-			}
-		}
-		
-		return answer;
-	}
 }
