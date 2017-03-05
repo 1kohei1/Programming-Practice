@@ -5,68 +5,94 @@ import java.util.HashMap;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-// uva 10004
+// UVa 315
 
 public class Main {
 
-	static int[][] map;
-	static int[] color;
+	static ArrayList<Integer>[] map;
+	static int dfs_counter;
+	static int[] visited;
+	static int[] dfs_num;
+	static int[] dfs_low;
+	static int[] isArticulation;
 	
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
 	
 		int n = in.nextInt();
-		while (n != 0) {
-			int l = in.nextInt();
+		in.nextLine();
+		
+		while (n > 0) {
 			
-			map = new int[n][n];
-			color = new int[n]; // Let use 1 and 2 to indicate bicolor
-			
-			for (int i = 0; i < l; i++) {
-				int a = in.nextInt();
-				int b = in.nextInt();
-				map[a][b] = 1;
-				map[b][a] = 1;
+			// Initialize variable
+			visited = new int[n];
+			dfs_counter = 0;
+			isArticulation = new int[n];
+			dfs_num = new int[n];
+			dfs_low = new int[n];
+			map = new ArrayList[n];
+			for (int i = 0; i < n; i++) {
+				map[i] = new ArrayList<Integer>();
 			}
 			
-			if (isBicolord()) {
-				System.out.println("BICOLORABLE.");
-			} else {
-				System.out.println("NOT BICOLORABLE.");
+			String s = in.nextLine();
+			while (s.length() != 1) {
+				String[] arr = s.split(" ");
+				
+				int start = new Integer(arr[0]) - 1;
+				for (int i = 1; i < arr.length; i++) {
+					int dst = new Integer(arr[i]) - 1;
+					map[start].add(dst);
+					map[dst].add(start);
+				}
+				
+				s = in.nextLine();
 			}
 			
+			solve(-1, 0);
+			
+			int numArticulation = 0;
+			for (int i = 0; i < n; i++) {
+				numArticulation += isArticulation[i];
+			}
+			
+			System.out.println(numArticulation);
 			
 			n = in.nextInt();
+			in.nextLine();
 		}
 	}
-
-	public static boolean isBicolord() {
-		// Use color 1 at index 0
-		color[0] = 1;
+	
+	public static void solve(int parent, int curr) {
+		dfs_num[curr] = dfs_counter;
+		dfs_low[curr] = dfs_counter;
+		dfs_counter++;
 		
-		ArrayList<Integer> q = new ArrayList<Integer>();
-		q.add(0);
+		visited[curr] = 1;
+		ArrayList<Integer> edges = map[curr];
 		
-		while (q.size() > 0) {
-			int curr = q.remove(0);
-			int nextColor = color[curr] == 1 ? 2 : 1;
+		int numChildren = 0;
+		
+		for (int i = 0; i < edges.size(); i++) {
+			int next = edges.get(i);
 			
-			for (int i = 0; i < map.length; i++) {
-				// If there is an edge and it is not colored yet.
-				if (map[curr][i] == 1 && color[i] == 0) {
-					// Check if neighbor node is already assigned a color. If they are assigned, make sure that color is different from nextColor
-					for (int j = 0; j < map.length; j++) {
-						if (map[i][j] == 1 && color[j] == nextColor) {
-							return false;
-						}
-					}
-					q.add(i);
-					color[i] = nextColor;
+			if (next == parent) continue;
+			
+			if (visited[next] == 1) {
+				dfs_low[curr] = Math.min(dfs_low[curr], dfs_low[next]);
+			} else {
+				numChildren++;
+				solve(curr, next);
+				
+				dfs_low[curr] = Math.min(dfs_low[curr], dfs_low[next]);
+				
+				if (parent == -1 && numChildren > 1) {
+					isArticulation[curr] = 1;
+				}
+				if (parent != -1 && dfs_num[curr] <= dfs_low[next]) {
+					isArticulation[curr] = 1;
 				}
 			}
 		}
-		return true;
-		
 	}
-	
 }
