@@ -79,7 +79,7 @@ public class Main {
 			if (next == parent) continue;
 			
 			if (visited[next] == 1) {
-				dfs_low[curr] = Math.min(dfs_low[curr], dfs_low[next]);
+				dfs_low[curr] = Math.min(dfs_low[curr], dfs_num[next]);
 			} else {
 				numChildren++;
 				solve(curr, next);
