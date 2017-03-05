@@ -111,6 +111,8 @@ public class Playground {
 				// and the first visited node's dfs_low value is less than the second visited node's dfs_low value. 
 				// I still don't know why we are not using dfs_low here. Please leave a comment if you know why we use dfs_num instead of dfs_low
 				
+				// I don't know why, but this must use dfs_num.
+				
 				// dfs_low[curr] = Math.min(dfs_low[curr], dfs_num[next]);
 				dfs_low[curr] = Math.min(dfs_low[curr], dfs_low[next]);
 			}
