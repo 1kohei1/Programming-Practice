@@ -1,6 +1,6 @@
 import java.util.*;
 
-// UVa 10765
+// UVa 796
 
 public class Main {
 
@@ -8,161 +8,107 @@ public class Main {
 	static int dfs_counter;
 	static int[] dfs_num;
 	static int[] dfs_low;
-	static ArrayList<Integer> articulations;
+	static ArrayList<Bridge> bridges;
 	
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
 		
-		int n = in.nextInt();
-		int m = in.nextInt();
-		articulations = new ArrayList<Integer>();
+		bridges = new ArrayList<Bridge>();
 		
-		while (n > 0 && m > 0) {
-						
+		while (in.hasNext()) {
+			int n = in.nextInt();
 			// Initialize variables
 			dfs_counter = 1;
+			bridges.clear();
 			dfs_num = new int[n];
 			dfs_low = new int[n];
-			articulations.clear();
 			map = new ArrayList[n];
 			for (int i = 0; i < n; i++) {
 				map[i] = new ArrayList<Integer>();
 			}
 			
-			// Get map
-			int a = in.nextInt();
-			int b = in.nextInt();
-			while (a >= 0 && b >= 0) {
-				map[a].add(b);
-				map[b].add(a);
-				
-				a = in.nextInt();
-				b = in.nextInt();
-			}
-			
-			// Find articulation points
-			findArticulation(-1, 0);
-			
-			ArrayList<Solution> solutions = new ArrayList<Solution>();
-			for (int i = 0; i < articulations.size(); i++) {
-				solutions.add(new Solution(articulations.get(i), calculatePidgeonValue(articulations.get(i))));
-			}
-			solutions.sort(null);
-			
-			if (m > solutions.size()) {
-				for (int i = 0; i < solutions.size(); i++) {
-					Solution s = solutions.get(i);
-					System.out.printf("%d %d\n", s.removing, s.pigeonValue);
-				}
-				// Pigeon value will be 1
-				int counter = 0;
-				int index = 0;
-				while (counter < m - solutions.size()) {
-					while (articulations.contains(index)) {
-						index++;
-					}
-					System.out.printf("%d %d\n", index, 1);
-					counter++;
-					index++;
-				}
-			} else {
-				for (int i = 0; i < m; i++) {
-					Solution s = solutions.get(i);
-					System.out.printf("%d %d\n", s.removing, s.pigeonValue);
+			for (int i = 0; i < n; i++) {
+				int start = in.nextInt();
+				String s = in.next();
+				int numEdges = new Integer(s.substring(1, s.length() - 1));
+				for (int j = 0; j < numEdges; j++) {
+					int end = in.nextInt();
+					map[start].add(end);
 				}
 			}
 			
-			// Get next test case
-			n = in.nextInt();
-			m = in.nextInt();
+			// Find articulation bridges
+			for (int i = 0; i < n; i++) {
+				if (dfs_num[i] == 0) {
+					articulation(-1, i);
+				}
+			}
+			
+			bridges.sort(null);
+			
+			// Print
+			System.out.printf("%d critical links\n", bridges.size());
+			for (int i = 0; i < bridges.size(); i++) {
+				Bridge b = bridges.get(i);
+				System.out.printf("%d - %d\n", b.start, b.end);
+			}
+			
 			System.out.println();
 		}
+		
 	}
 	
-	public static void findArticulation(int parent, int curr) {
+	public static void articulation(int parent, int curr) {
 		dfs_num[curr] = dfs_counter;
 		dfs_low[curr] = dfs_counter;
 		dfs_counter++;
 		
-		int numChildren = 0;
 		ArrayList<Integer> edge = map[curr];
 		
 		for (int i = 0; i < edge.size(); i++) {
 			int next = edge.get(i);
 			
-			// Next node is not visited yet.
+			// Not visited yet
 			if (dfs_num[next] == 0) {
-				numChildren++;
-				findArticulation(curr, next);
+				articulation(curr, next);
 				
 				dfs_low[curr] = Math.min(dfs_low[curr], dfs_low[next]);
-				
-				if (parent != -1 && dfs_num[curr] <= dfs_low[next] && !articulations.contains(curr)) {
-					articulations.add(curr);
+			
+				if (dfs_num[curr] < dfs_low[next]) {
+					bridges.add(new Bridge(curr, next));
 				}
-			}
-			// Next node is visited. But not parent. Back edge
-			else if (parent != next) {
+			} 
+			// Visited node and not parent
+			else if (next != parent) {
 				dfs_low[curr] = Math.min(dfs_low[curr], dfs_num[next]);
 			}
 		}
 		
-		if (parent == -1 && numChildren > 1 && !articulations.contains(curr)) {
-			articulations.add(curr);
-		}
-	}
-
-	public static int calculatePidgeonValue(int removingIndex) {
-		int pv = 0;
-		
-		int n = map.length;
-		boolean[] visited = new boolean[n];
-		visited[removingIndex] = true;
-		
-		ArrayList<Integer> edge = map[removingIndex];
-		for (int i = 0; i < edge.size(); i++) {
-			int next = edge.get(i);
-			
-			if (visited[next] == false) {
-				pv++;
-				recurr(next, removingIndex, visited);
-			}
-		}
-		
-		return pv;
-	}
-	
-	public static void recurr(int index, int removingIndex, boolean[] visited) {
-		visited[index] = true;
-		
-		ArrayList<Integer> edge = map[index];
-		for (int i = 0; i < edge.size(); i++) {
-			int next = edge.get(i);
-			
-			if (visited[next] == false) {
-				recurr(next, removingIndex, visited);
-			}
-		}
 	}
 }
 
-class Solution implements Comparable<Solution> {
-
-	int removing;
-	int pigeonValue;
+class Bridge implements Comparable<Bridge> {
+	int start;
+	int end;
 	
-	public Solution(int removing, int pigeonValue) {
-		this.removing = removing;
-		this.pigeonValue = pigeonValue;
+	public Bridge(int start, int end) {
+		if (start < end) {
+			this.start = start;
+			this.end = end;
+		} else {
+			this.start = end;
+			this.end = start;
+		}
 	}
 	
 	@Override
-	public int compareTo(Solution o) {
-		if (this.pigeonValue == o.pigeonValue) {
-			return this.removing - o.removing;
+	public int compareTo(Bridge o) {
+		if (this.start == o.start) {
+			return this.end - o.end;
 		} else {
-			return o.pigeonValue - this.pigeonValue;
+			return this.start - o.start;
 		}
 	}
+	
 	
 }
