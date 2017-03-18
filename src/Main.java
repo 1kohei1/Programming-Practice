@@ -1,95 +1,79 @@
 import java.util.*;
 
-// UVa 11709
+// UVa 11504
 
 public class Main {
 
-	static int numScc;
-	static int[] dfs_num;
-	static int[] dfs_low;
-	static int dfs_counter;
+	static int n;
+	static int[] visited;
+	static int answer;
+	static int index;
+	static int[] ts;
 	static ArrayList[] map;
-	static Stack<Integer> stack;
-	static int[] inStack;
 	
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
 
-		int p = in.nextInt();
-		int t = in.nextInt();
-		HashMap<String, Integer> names = new HashMap<String, Integer>();
-		stack = new Stack<Integer>();
+		int numTests = in.nextInt();
 		
-		while (p > 0 && t >= 0) {
-			in.nextLine();
+		while (numTests-- > 0) {
+			n = in.nextInt();
+			int m = in.nextInt();
 			
-			// Initialize variables
-			numScc = 0;
-			dfs_num = new int[p];
-			dfs_low = new int[p];
-			dfs_counter = 1;
-			map = new ArrayList[p];
-			inStack = new int[p];
-			names.clear();
-			for (int i = 0; i < p; i++) {
-				String s = in.nextLine();
-				names.put(s, i);
+			map = new ArrayList[n];
+			ts = new int[n];
+			visited = new int[n];
+			for (int i = 0; i < n; i++) {
 				map[i] = new ArrayList<Integer>();
 			}
 			
-			while (t-- > 0) {
-				String s1 = in.nextLine();
-				String s2 = in.nextLine();
+			while (m-- > 0) {
+				int a = in.nextInt() - 1;
+				int b = in.nextInt() - 1;
 				
-				int i1 = names.get(s1);
-				int i2 = names.get(s2);
-				
-				if (!map[i1].contains(i2)) {
-					map[i1].add(i2);
+				if (!map[a].contains(b)) {
+					map[a].add(b);
 				}
 			}
 			
-			for (int i = 0; i < p; i++) {
-				if (dfs_num[i] == 0) {
-					scc(i);					
+			// Topological sort
+			index = n - 1;
+			for (int i = 0; i < n; i++) {
+				if (visited[i] == 0) {
+					toposort(i);
 				}
 			}
 			
-			System.out.println(numScc);
-			
-			p = in.nextInt();
-			t = in.nextInt();
+			// Start from node in ts
+			answer = 0;
+			Arrays.fill(visited, 0);
+			for (int i = 0; i < n; i++) {
+				if (visited[ts[i]] == 0) {
+					answer++;
+					dfs(ts[i]);
+				}
+			}
+			System.out.println(answer);
 		}
 	}
 	
-	public static void scc(int curr) {
-		dfs_num[curr] = dfs_counter;
-		dfs_low[curr] = dfs_counter;
-		dfs_counter++;
-		
-		stack.push(curr);
-		inStack[curr] = 1;
-		ArrayList<Integer> edge = map[curr];
-		
-		for (int i = 0; i < edge.size(); i++) {
-			int next = edge.get(i);
-			
-			if (dfs_num[next] == 0) {
-				scc(next);
-			}
-			if (inStack[next] == 1) {
-				dfs_low[curr] = Math.min(dfs_low[curr], dfs_low[next]);
+	public static void dfs(int curr) {
+		visited[curr] = 1;
+		for (int i = 0; i < map[curr].size(); i++) {
+			if (visited[(int) map[curr].get(i)] == 0) {
+				dfs((int) map[curr].get(i));
 			}
 		}
-		
-		if (dfs_low[curr] == dfs_num[curr]) {
-			int pop = stack.pop();
-			while (pop != curr) {
-				inStack[pop] = 0;
-				pop = stack.pop();
+	}
+	
+	public static void toposort(int curr) {
+		visited[curr] = 1;
+		for (int i = 0; i < map[curr].size(); i++) {
+			if (visited[(int) map[curr].get(i)] == 0) {
+				toposort((int) map[curr].get(i));
 			}
-			inStack[pop] = 0;
-			numScc++;
 		}
+		ts[index] = curr;
+		index--;
 	}
 }
