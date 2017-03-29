@@ -1,52 +1,51 @@
 import java.util.*;
 
-// ABC 50-C
-// http://abc050.contest.atcoder.jp/tasks/arc066_a
+// ABC 45-C
+// http://abc045.contest.atcoder.jp/tasks/arc061_a
 
 public class Main {
 	
-	static int MOD = 1000000007;
+    static int n;
+    static int[] nums;
 
-	public static void main(String[] args) {
-		Scanner in = new Scanner(System.in);
-		
-		int n = in.nextInt();
-		int[] freq = new int[n];
-		for (int i = 0; i < n; i++) {
-			freq[in.nextInt()]++;
-		}
-		
-		boolean isValid = true;
-		
-		if (n % 2 == 1) {
-			if (freq[0] != 1) {
-				isValid = false;
-			}
-			for (int i = 2; i < n; i += 2) {
-				if (freq[i] != 2) {
-					isValid = false;
-					break;
-				}
-			}
-		} else {
-			for (int i = 1; i < n; i += 2) {
-				if (freq[i] != 2) {
-					isValid = false;
-					break;
-				}
-			}
-		}
-		
-		long answer = 1;
-		if (isValid) {
-			for (int i = 0; i < n / 2; i++) {
-				answer *= 2;
-				answer %= MOD;
-			}
-		} else {
-			answer = 0;
-		}
-		System.out.println(answer);
-		
+	public static void main (String[] args) throws java.lang.Exception {
+	    Scanner in = new Scanner(System.in);
+	    String s = in.next();
+	    n = s.length();
+	    nums = new int[n];
+	    
+	    for (int i = 0; i < n; i++) {
+	        nums[i] = new Integer(s.substring(i, i + 1));
+	    }
+	    
+	    long answer = 0;
+	    for (int i = 0; i < (1 << (n - 1)); i++) {
+	        answer += solve(i);
+	    }
+	    
+	    System.out.println(answer);
+	}
+	
+	public static long solve(int a) {
+	    long sofar = 0;
+	    long returnv = 0;
+	    for (int i = 0; i < n; i++) {
+	       // System.out.printf("%d%c", nums[i], (a & (1 << i)) > 0 ? '+' : ' ');
+
+            sofar *= 10;
+            sofar += nums[i];
+	        
+
+	        if ((a & (1 << i)) > 0) {
+	            returnv += sofar;
+	            sofar = 0;
+	        } else {
+	           // sofar *= 10;
+	           // sofar += nums[i];
+	        }
+	    }
+	    returnv += sofar;
+	   // System.out.printf(": returnv: %d\n", returnv);
+	    return returnv;
 	}
 }
