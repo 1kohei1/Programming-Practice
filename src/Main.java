@@ -1,66 +1,47 @@
 import java.util.*;
  
-// ABC 7-C
-// https://abc007.contest.atcoder.jp/tasks/abc007_3
+// ABC 6-C
+// http://abc006.contest.atcoder.jp/tasks/abc006_3
  
 public class Main {
- 
-	static int[] dx = new int[]{-1, 0, 1, 0};
-	static int[] dy = new int[]{0, -1, 0, 1};
+
+	static int n;
+	static int m;
+	static boolean answerFound = false;
+	static int a = -1;
+	static int b = -1;
+	static int c = -1;
+	static int[][] dp;
 	
 	public static void main (String[] args) throws java.lang.Exception {
 	    Scanner in = new Scanner(System.in);
-	   
-	    int r = in.nextInt();
-	    int c = in.nextInt();
+
+	    n = in.nextInt();
+	    m = in.nextInt();
 	    
-	    int sx = in.nextInt() - 1;
-	    int sy = in.nextInt() - 1;
-	    
-	    int gx = in.nextInt() - 1;
-	    int gy = in.nextInt() - 1;
-	    
-	    char[][] map = new char[r][c];
-	    for (int i = 0; i < r; i++) {
-	    	map[i] = in.next().toCharArray();
-	    }
-	    
-	    int answer = 0;
-	    ArrayList<Integer> q = new ArrayList<Integer>();
-	    q.add(sx);
-	    q.add(sy);
-	    q.add(0);
-	    
-	    while (q.size() > 0) {
-	    	int cx = q.remove(0);
-	    	int cy = q.remove(0);
-	    	int step = q.remove(0);
-	    
-	    	if (cx == gx && cy == gy) {
-	    		answer = step;
-	    		break;
-	    	}
-	    	
-	    	// This node is already visited.
-	    	if (map[cx][cy] == '#') {
-	    		continue;
-	    	}
-	    	
-	    	// Make it visited
-	    	map[cx][cy] = '#';
-	    	
-	    	for (int i = 0; i < 4; i++) {
-	    		int nx = cx + dx[i];
-	    		int ny = cy + dy[i];
-	    		
-	    		if (0 <= nx && nx < r && 0 <= ny && ny < c && map[nx][ny] == '.') {
-	    			q.add(nx);
-	    			q.add(ny);
-	    			q.add(step + 1);
-	    		}
-	    	}
-	    }
-	    
-	    System.out.println(answer);
+	    dp = new int[n + 1][m + 1];
+	    solve(0, m, 0, 0, 0);
+	    System.out.printf("%d %d %d\n", a, b, c);
+	}
+	
+	public static void solve(int nn, int mm, int aa, int bb, int cc) {
+		if (nn == n && mm == 0) {
+			answerFound = true;
+			a = aa;
+			b = bb;
+			c = cc;
+		} else if (answerFound || nn > n || mm < 0 || dp[nn][mm] == 1) {
+			return;
+		} else {
+			// child
+			solve(nn + 1, mm - 4, aa, bb, cc + 1);
+			// elder
+			solve(nn + 1, mm - 3, aa, bb + 1, cc);
+			// adult
+			solve(nn + 1, mm - 2, aa + 1, bb, cc);
+			
+			// Don't explore this combination any more
+			dp[nn][mm] = 1;
+		}
 	}
 }
