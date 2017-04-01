@@ -1,30 +1,40 @@
 import java.util.*;
 
-// ABC 29-C
-// http://abc029.contest.atcoder.jp/tasks/abc029_c
+// ABC 28-C
+// http://abc028.contest.atcoder.jp/tasks/abc028_c
 
 public class Main {
 
-	static int n;
+	static int sumCount = 0;
+	static int[] nums;
+	static int[] sums;
 	
 	public static void main (String[] args) throws java.lang.Exception {
 	    Scanner in = new Scanner(System.in);
 
-	    n = in.nextInt();
-	    char[] c = new char[n];
-	    solve(0, c);
+	    nums = new int[5];
+	    sums = new int[10];
+	    
+	    for (int i = 0; i < 5; i++) {
+	    	nums[i] = in.nextInt();
+	    }
+	    solve(0, 0, 0);
+	    Arrays.sort(sums);
+	    System.out.println(sums[7]);
 	}
 	
-	public static void solve(int index, char[] c) {
-		if (index == n) {
-			System.out.println(new String(c));
+	public static void solve(int count, int index, int sum) {
+		if (count == 3) {
+			sums[sumCount] = sum;
+			sumCount++;
 			return;
 		}
-		c[index] = 'a';
-		solve(index + 1, c);
-		c[index] = 'b';
-		solve(index + 1, c);
-		c[index] = 'c';
-		solve(index + 1, c);
+		if (count > 3 || index == nums.length) {
+			return;
+		}
+		// Don't pick it
+		solve(count, index + 1, sum);
+		// Pick it
+		solve(count + 1, index + 1, sum + nums[index]);
 	}
 }
