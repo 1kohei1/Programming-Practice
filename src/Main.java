@@ -1,40 +1,45 @@
 import java.util.*;
 
-// ABC 28-C
-// http://abc028.contest.atcoder.jp/tasks/abc028_c
+// ABC 16-C
+// http://abc016.contest.atcoder.jp/tasks/abc016_3
 
 public class Main {
 
-	static int sumCount = 0;
-	static int[] nums;
-	static int[] sums;
+	static int n;
+	static int[][] map;
 	
 	public static void main (String[] args) throws java.lang.Exception {
 	    Scanner in = new Scanner(System.in);
-
-	    nums = new int[5];
-	    sums = new int[10];
 	    
-	    for (int i = 0; i < 5; i++) {
-	    	nums[i] = in.nextInt();
+	    n = in.nextInt();
+	    int m = in.nextInt();
+	    
+	    map = new int[n][n];
+	    for (int i = 0; i < m; i++) {
+	    	int a = in.nextInt() - 1;
+	    	int b = in.nextInt() - 1;
+	    	map[a][b] = 1;
+	    	map[b][a] = 1;
 	    }
-	    solve(0, 0, 0);
-	    Arrays.sort(sums);
-	    System.out.println(sums[7]);
+	    
+	    for (int i = 0; i < n; i++) {
+	    	System.out.println(solve(i));
+	    }
 	}
 	
-	public static void solve(int count, int index, int sum) {
-		if (count == 3) {
-			sums[sumCount] = sum;
-			sumCount++;
-			return;
+	public static int solve(int start) {
+		int count = 0;
+		ArrayList<Integer> counted = new ArrayList<Integer>();
+		for (int i = 0; i < n; i++) {
+			if (map[start][i] == 1) {
+				for (int j = 0; j < n; j++) {
+					if (map[i][j] == 1 && start != j && map[start][j] == 0 && !counted.contains(j)) {
+						count++;
+						counted.add(j);
+					}
+				}
+			}
 		}
-		if (count > 3 || index == nums.length) {
-			return;
-		}
-		// Don't pick it
-		solve(count, index + 1, sum);
-		// Pick it
-		solve(count + 1, index + 1, sum + nums[index]);
+		return count;
 	}
 }
