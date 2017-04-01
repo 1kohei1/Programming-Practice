@@ -1,45 +1,38 @@
 import java.util.*;
  
-// ABC 11-C
-// http://abc011.contest.atcoder.jp/tasks/abc011_3
+// ABC 10-C
+// http://abc010.contest.atcoder.jp/tasks/abc010_3
  
 public class Main {
  
-	static int n;
-	
-	static int a;
-	static int b;
-	static int c;
-	
-	static int[] dp;
-	
 	public static void main (String[] args) throws java.lang.Exception {
 	    Scanner in = new Scanner(System.in);
 	    
-	    n = in.nextInt();
+	    int x1 = in.nextInt();
+	    int y1 = in.nextInt();
+	    int x2 = in.nextInt();
+	    int y2 = in.nextInt();
 	    
-	    a = in.nextInt();
-	    b = in.nextInt();
-	    c = in.nextInt();
+	    int t = in.nextInt();
+	    int v = in.nextInt();
+	    int maxd = t * v;
 	    
-	    dp = new int[n + 1];
+	    int n = in.nextInt();
+	    int count = 0;
+	    for (int i = 0; i < n; i++) {
+	    	int x = in.nextInt();
+	    	int y = in.nextInt();
+	    	
+	    	double d = dist(x1, y1, x, y) + dist(x, y, x2, y2);
+	    	if (d <= maxd) {
+	    		count++;
+	    	}
+	    }
 	    
-	    filldp(0, 0);
-	    System.out.println(dp[n] == 0 || dp[n] > 100 ? "NO" : "YES");
+	    System.out.println(count > 0 ? "YES" : "NO");
 	}
 	
-	public static void filldp(int op, int pre) {
-		if (pre + 3 < n + 1 && dp[pre + 3] == 0 && pre + 3 != a && pre + 3 != b && pre + 3 != c) {
-			dp[pre + 3] = dp[pre] + 1;
-			filldp(op + 1, pre + 3);
-		}
-		if (pre + 2 < n + 1 && dp[pre + 2] == 0 && pre + 2 != a && pre + 2 != b && pre + 2 != c) {
-			dp[pre + 2] = dp[pre] + 1;
-			filldp(op + 1, pre + 2);
-		}
-		if (pre + 1 < n + 1 && dp[pre + 1] == 0 && pre + 1 != a && pre + 1 != b && pre + 1 != c) {
-			dp[pre + 1] = dp[pre] + 1;
-			filldp(op + 1, pre + 1);
-		}
+	public static double dist(int x1, int y1, int x2, int y2) {
+		return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 	}
 }
