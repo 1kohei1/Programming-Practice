@@ -1,7 +1,7 @@
 import java.util.*;
 
-// ABC 42-C
-// http://abc042.contest.atcoder.jp/tasks/arc058_a
+// ABC 38-C
+// http://abc038.contest.atcoder.jp/tasks/abc038_c
 
 public class Main {
 	
@@ -9,29 +9,27 @@ public class Main {
 	    Scanner in = new Scanner(System.in);
 	    
 	    int n = in.nextInt();
-	    int k = in.nextInt();
-	    HashMap<Integer, Integer> avoid = new HashMap<Integer, Integer>();
+	    int[] nums = new int[n];
 	    
-	    for (int i = 0; i < k; i++) {
-	    	avoid.put(in.nextInt(), 1);
+	    for (int i = 0; i < n; i++) {
+	    	nums[i] = in.nextInt();
 	    }
 	    
-	    while (!isConditionMet(avoid, n)) {
-	    	n++;
+	    long[] answer = new long[n + 1];
+	    answer[n] = 0;
+	    int pre = Integer.MAX_VALUE;
+	    int lastIndex = n - 1;
+
+	    for (int i = n - 1; i >= 0; i--) {
+	    	if (nums[i] < pre) {
+	    		answer[i] = answer[i + 1] + (lastIndex - i + 1);
+	    	} else {
+	    		answer[i] = answer[i + 1] + 1;
+	    		lastIndex = i;
+	    	}
+	    	pre = nums[i];
 	    }
-	    System.out.println(n);
-	}
-	
-	public static boolean isConditionMet(HashMap<Integer, Integer> avoid, int n) {
-		while (n > 0) {
-			if (avoid.containsKey(n % 10)) {
-				return false;
-			}
-			if (n == 0) {
-				break;
-			}
-			n /= 10;
-		}
-		return true;
+	    
+	    System.out.println(answer[0]);
 	}
 }
