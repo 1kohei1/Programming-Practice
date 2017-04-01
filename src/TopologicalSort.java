@@ -143,6 +143,10 @@ class Point {
 		connectsTo = new ArrayList<Integer>();
 	}
 
+	public Point(double d, double e) {
+		// TODO Auto-generated constructor stub
+	}
+
 	public boolean equals(Object obj) {
 		return this.n == ((Point) obj).n;
 	}
