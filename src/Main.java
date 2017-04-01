@@ -1,7 +1,7 @@
 import java.util.*;
 
-// ABC 43-C
-// http://abc043.contest.atcoder.jp/tasks/arc059_a
+// ABC 42-C
+// http://abc042.contest.atcoder.jp/tasks/arc058_a
 
 public class Main {
 	
@@ -9,24 +9,29 @@ public class Main {
 	    Scanner in = new Scanner(System.in);
 	    
 	    int n = in.nextInt();
-	    int[] nums = new int[n];
-	    int sum = 0;
+	    int k = in.nextInt();
+	    HashMap<Integer, Integer> avoid = new HashMap<Integer, Integer>();
 	    
-	    for (int i = 0; i < n; i++) {
-	    	nums[i] = in.nextInt();
-	    	sum += nums[i];
+	    for (int i = 0; i < k; i++) {
+	    	avoid.put(in.nextInt(), 1);
 	    }
 	    
-	    int avg = sum / n; // Probably need to investigate avg + 1 too
-	    
-	    System.out.println(Math.min(cost(nums, avg), cost(nums, avg + 1)));
+	    while (!isConditionMet(avoid, n)) {
+	    	n++;
+	    }
+	    System.out.println(n);
 	}
 	
-	public static int cost(int[] nums, int avg) {
-		int cost = 0;
-		for (int i = 0; i < nums.length; i++) {
-			cost += (nums[i] - avg) * (nums[i] - avg);
+	public static boolean isConditionMet(HashMap<Integer, Integer> avoid, int n) {
+		while (n > 0) {
+			if (avoid.containsKey(n % 10)) {
+				return false;
+			}
+			if (n == 0) {
+				break;
+			}
+			n /= 10;
 		}
-		return cost;
+		return true;
 	}
 }
