@@ -1,79 +1,160 @@
 import java.util.*;
  
-// ABC 21-C
-// http://abc021.contest.atcoder.jp/tasks/abc021_c
+// ABC 20-C
+// http://abc020.contest.atcoder.jp/tasks/abc020_c
  
 public class Main {
+
+	static int h;
+	static int w;
+	static int t;
+	static char[][] map;
 	
+	static int startr = 0;
+	static int startc = 0;
+	static int goalr = 0;
+	static int goalc = 0;
+	
+	static boolean canReachGoal;
+	static int[] dx = new int[]{-1, 0, 1, 0};
+	static int[] dy = new int[]{0, -1, 0, 1};
+
 	public static void main (String[] args) throws java.lang.Exception {
 		Scanner in = new Scanner(System.in);
 		
-		int n = in.nextInt();
-		int a = in.nextInt() - 1;
-		int b = in.nextInt() - 1;
+		h = in.nextInt();
+		w = in.nextInt();
+		t = in.nextInt();
 		
-		ArrayList[] map = new ArrayList[n];
-		for (int i = 0; i < n; i++) {
-			map[i] = new ArrayList<Integer>();
+		map = new char[h][w];
+		for (int i = 0; i < h; i++) {
+			map[i] = in.next().toCharArray();
+			for (int j = 0; j < w; j++) {
+				if (map[i][j] == 'S') {
+					startr = i;
+					startc = j;
+				}
+				if (map[i][j] == 'G') {
+					goalr = i;
+					goalc = j;
+				}
+			}
 		}
 		
-		int m = in.nextInt();
-		for (int i = 0; i < m; i++) {
-			int x = in.nextInt() - 1;
-			int y = in.nextInt() - 1;
-			
-			map[x].add(y);
-			map[y].add(x);
+		System.out.println(binarysearch());
+	}
+	
+	public static int binarysearch() {
+		int low = 1;
+		int high = t;
+		
+		while (low <= high) {
+			int mid = (low + high) / 2;
+			if (canReachGoalWithX(mid)) {
+				low = mid + 1;
+			} else {
+				high = mid - 1;
+			}
 		}
+		return high;
+	}
+
+	/* Not a good approach. Too much computations
+	public static boolean canReachGoal(int x) {
+		canReachGoal = false;
+		char[][] visited = new char[h][w];
+		visited[startr][startc] = '1';
+		canReachGoalRec(0, x, startr, startc, visited);
+		return canReachGoal ;
+	}
+	*/
+	
+	public static boolean canReachGoalWithX(int x) {
+		PriorityQueue<CustomClass> q = new PriorityQueue<CustomClass>();
+		q.add(new CustomClass(startr, startc, 0));
 		
+		int[][] visited = new int[h][w];
 		
-		int[] numWay = new int[n]; // numWay[x] stores the number of way to reach x with minimum way
-		int[] dist = new int[n];   // dist[x] stores the minimum path took to reach x
-		int[] visited = new int[n];
-		
-		boolean isAnswerFound = false;
-		
-		// Stores prevNode, currNode, distToCurr
-		ArrayList<Integer> q = new ArrayList<Integer>();
-		q.add(-1);
-		q.add(a);
-		q.add(0);
+		int[][] dist = new int[h][w];
+		for (int i = 0; i < h; i++) {
+			Arrays.fill(dist[i], Integer.MAX_VALUE / 2 - 1);
+		}
+		dist[startr][startc] = 0;
 		
 		while (q.size() > 0) {
-			int prev = q.remove(0);
-			int curr = q.remove(0);
-			int distToCurr = q.remove(0);
-
-			// If it is already investigated,
-			if (visited[curr] == 1) {
-				// And if the distance to next is equal to that node
-				if (dist[curr] == distToCurr) {
-					numWay[curr] += numWay[prev];
-					numWay[curr] %= 1000000007;
-				}
+			CustomClass curr = q.poll();
+			
+			if (curr.r == goalr && curr.c == goalc) {
+				break;
+			}
+			if (visited[curr.r][curr.c] == 1) {
 				continue;
 			}
-			visited[curr] = 1;
-			numWay[curr] = prev == -1 ? 1 : numWay[prev];
-			dist[curr] = distToCurr;
 			
-			for (int i = 0; i < map[curr].size(); i++) {
-				int next = (int) map[curr].get(i);
+			visited[curr.r][curr.c] = 1;
+			for (int i = 0; i < 4; i++) {
+				int newr = curr.r + dx[i];
+				int newc = curr.c + dy[i];
 				
-				if (visited[next] == 0) {
-					q.add(curr);
-					q.add(next);
-					q.add(distToCurr + 1);
-				} else if (dist[next] == distToCurr + 1) {
-					System.out.println("come here");
-					numWay[next] += numWay[curr];
-					numWay[curr] %= 1000000007;
+				if (0 <= newr && newr < h && 0 <= newc && newc < w && visited[newr][newc] == 0) {
+					int cost = map[newr][newc] == '#' ? x : 1;
+					
+					if (dist[curr.r][curr.c] + cost < dist[newr][newc]) {
+						dist[newr][newc] = dist[curr.r][curr.c] + cost;
+						q.add(new CustomClass(newr, newc, dist[newr][newc]));
+					}
 				}
 			}
 		}
-//		for (int i = 0; i < n; i++) {
-//			System.out.printf("%d: %d\n", i, numWay[i]);
-//		}
-		System.out.println(numWay[b]);
+		return dist[goalr][goalc] <= t;
+		
 	}
+	
+	/* Not a good approach. Too much computations
+	public static void canReachGoalRec(int time, int x, int r, int c, char[][] visited) {
+		
+		if (time > t) {
+			return;
+		}
+		if (r == goalr && c == goalc) {
+			canReachGoal = true;
+			return;
+		}
+		// If we already know we can reach goal, no more investigation
+		if (canReachGoal) {
+			return;
+		}
+		
+		for (int i = 0; i < 4; i++) {
+			int newr = r + dx[i];
+			int newc = c + dy[i];
+			
+			if (0 <= newr && newr < h && 0 <= newc && newc < w && visited[newr][newc] == '\0') {
+				int addt = map[newr][newc] == '#' ? x : 1;
+				visited[newr][newc] = '1';
+				canReachGoalRec(time + addt, x, newr, newc, visited);
+				visited[newr][newc] = '\0';
+			}
+		}
+	}
+	*/
+}
+
+class CustomClass implements Comparable<CustomClass> {
+	int r;
+	int c;
+	int dist;
+	
+	public CustomClass(int r, int c, int dist) {
+		this.r = r;
+		this.c = c;
+		this.dist = dist;
+	}
+	
+	@Override
+	public int compareTo(CustomClass o) {
+		return this.dist - o.dist;
+	}
+	
+	
 }
