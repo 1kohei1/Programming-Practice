@@ -1,59 +1,28 @@
 import java.util.*;
 
-// ABC 22-C
-// http://abc022.contest.atcoder.jp/tasks/abc022_c
+// ABC 57-C
+// http://abc057.contest.atcoder.jp/tasks/abc057_c
  
 public class Main {
 
-	static int n;
-	
 	public static void main (String[] args) throws java.lang.Exception {
 		Scanner in = new Scanner(System.in);
-
-		n = in.nextInt();
-		int m = in.nextInt();
-		int[][] map = new int[n][n];
-		int[][] minmap = new int[n][n];
-		for (int i = 0; i < n; i++) {
-			Arrays.fill(minmap[i], Integer.MAX_VALUE / 2 - 1);
-		}
-
-		for (int i = 0; i < m; i++) {
-			int s = in.nextInt() - 1;
-			int g = in.nextInt() - 1;
-			int d = in.nextInt();
-			
-			map[s][g] = d;
-			map[g][s] = d;
-			
-			if (s != 0 && g != 0) {
-				minmap[s][g] = d;
-				minmap[g][s] = d;
+		
+		long n = in.nextLong();
+		for (int i = (int) Math.sqrt(n); i > 0; i--) {
+			if (n % i == 0) {
+				System.out.println(Math.max(numDigit(i), numDigit((int) (n / i))));
+				break;
 			}
 		}
-		
-		for (int k = 0; k < n; k++) {
-			for (int i = 0; i < n; i++) {
-				for (int j = 0; j < n; j++) {
-					minmap[i][j] = Math.min(minmap[i][j], minmap[i][k] + minmap[k][j]);
-				}
-			}
+	}
+	
+	public static int numDigit(int n) {
+		int answer = 0;
+		while (n > 0) {
+			answer++;
+			n /= 10;
 		}
-		
-		boolean answerFound = false;
-		int answer = Integer.MAX_VALUE;
-		
-		for (int i = 0; i < n; i++) {
-			if (map[0][i] > 0) {
-				for (int j = i + 1; j < n; j++) {
-					if (map[0][j] > 0 && minmap[i][j] != Integer.MAX_VALUE / 2 - 1) {
-						answerFound = true;
-						answer = Math.min(answer, map[0][i] + map[0][j] + minmap[i][j]);
-					}
-				}
-			}
-		}
-		
-		System.out.println(answerFound ? answer : -1);
+		return answer;
 	}
 }
