@@ -1,54 +1,25 @@
 import java.util.*;
 
-// ABC 32-C
-// http://abc032.contest.atcoder.jp/tasks/abc032_c
+// ABC 6-C
+// http://abc006.contest.atcoder.jp/tasks/abc006_3
  
 public class Main {
-
+	
 	public static void main (String[] args) throws java.lang.Exception {
 		Scanner in = new Scanner(System.in);
 		
 		int n = in.nextInt();
-		int k = in.nextInt();
+		int m = in.nextInt();
 		
-		int[] nums = new int[n];
-		boolean zeroFlag = false;
-		
-		for (int i = 0; i < n; i++) {
-			nums[i] = in.nextInt();
-			if (nums[i] == 0) {
-				zeroFlag = true;
-			}
-		}
-		
-		if (zeroFlag) {
-			System.out.println(n);
+		if (n * 4 < m || m < 2 * n) {
+			System.out.println("-1 -1 -1");
 		} else {
-			int start = 0;
-			int end = 0;
+			int a = 0, b = 0, c = 0; // a: 大人, b: 老人, c: 赤ちゃん
+			int X = 4 * n - m;
+			int Y = X / 2;
+			int Z = (X + 1) / 2;
 			
-			long multi = 1;
-			int answer = 0;
-			
-			while (end < n) {
-				// Extend end as long as the multi is less than equal to k
-				while (end < n && multi * nums[end] <= k) {
-					multi *= nums[end];
-					end++;
-				}
-				answer = Math.max(answer, end - start);
-				
-				if (start == end) {
-					start++;
-					end++;
-					multi = 1;
-				} else {
-					multi /= nums[start];
-					start++;
-				}
-			}
-			
-			System.out.println(answer);
+			System.out.printf("%d %d %d\n", Y, X % 2 == 0 ? 0 : 1, n - Z);
 		}
 	}
 }
