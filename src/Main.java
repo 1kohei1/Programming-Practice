@@ -1,48 +1,88 @@
 import java.util.*;
 
-// ABC 59-C
-// http://abc059.contest.atcoder.jp/tasks/arc072_a
+// ABC 27-C
+// http://abc027.contest.atcoder.jp/tasks/abc027_c
  
 public class Main {
 	
 	public static void main (String[] args) throws java.lang.Exception {
 		Scanner in = new Scanner(System.in);
-
-		int n = in.nextInt();
 		
-		int[] nums = new int[n];
-		for (int i = 0; i < n; i++) {
-			nums[i] = in.nextInt();
-		}
-		
-		long answer = solve(nums, 0, 0);
-		if (nums[0] > 0) {
-			answer = Math.min(solve(nums, nums[0], 1), nums[0] + 1 + solve(nums, -1, 1));
-		} else if (nums[0] < 0) {
-			answer = Math.min(solve(nums, nums[0], 1), Math.abs(nums[0]) + 1 + solve(nums, 1, 1));
-		} else {
-			answer = Math.min(1 + solve(nums, 1, 1), 1 + solve(nums, -1, 1));
-		}
-		
-		System.out.println(answer);
+		long n = in.nextLong();
+		solve(n);
 	}
 	
-	public static long solve(int[] nums, long sum, int index) {
-		if (index == nums.length) {
-			return 0;
-		}
-		if (sum < 0 && sum + nums[index] < 0) {
-			return 1 + Math.abs(sum + nums[index]) + solve(nums, 1, index + 1);
-		} else if (sum > 0 && sum + nums[index] > 0) {
-			return 1 + sum + nums[index] + solve(nums, -1, index + 1);
-		} else if (sum + nums[index] == 0) {
-			if (sum > 0) {
-				return 1 + solve(nums, -1, index + 1);
-			} else {
-				return 1 + solve(nums, 1, index + 1);
-			}
+	public static void solve(long n) {
+		String winner = "";
+		
+		if (n == 1) {
+			winner = "Aoki";
+		} else if (n == 2 || n == 3) {
+			winner = "Takahashi";
 		} else {
-			return solve(nums, sum + nums[index], index + 1);
+			int numBit = sigBit(n);
+			boolean isInArow = numBit % 2 == 0;
+			long left = (long) 1 << numBit;
+			long right = (long) 1 << (numBit + 1);
+			
+			long zigzag = zigzag(numBit, isInArow);
+			
+			if (isInArow) {
+				if (left <= n && n < zigzag) {
+					winner = "Takahashi";
+				} else {
+					winner = "Aoki";
+				}
+			} else {
+				if (zigzag <= n && n < right) {
+					winner = "Takahashi";
+				} else {
+					winner = "Aoki";
+				}
+			}
 		}
+		
+		System.out.println(winner);
+	}
+	
+	public static long zigzag(int numBit, boolean isInArow) {
+		long returnv = 1;
+		for (int i = 1; i <= numBit; i++) {
+			// We can shorten this code, but to make the logic easy to understand, I leave this in redundant way.
+			// If it is in A row, A always go to right and B always go to left
+			if (isInArow) {
+				// This is A action. Go right
+				if (i % 2 == 1) {
+					returnv *= 2;
+					returnv++;
+				}
+				// This is B action. Go left
+				else {
+					returnv *= 2;
+				}
+			}
+			// If it is in B row, A always go to left and B always go to right
+			else {
+				// This is A action. Go left
+				if (i % 2 == 1) {
+					returnv *= 2;
+				}
+				// This is B action. Go right
+				else {
+					returnv *= 2;
+					returnv++;
+				}
+			}
+		}
+		return returnv;
+	}
+	
+	public static int sigBit(long a) {
+		int num = 0;
+		while ((a >> 1) > 0) {
+			a = a >> 1;
+			num++;
+		}
+		return num;
 	}
 }
