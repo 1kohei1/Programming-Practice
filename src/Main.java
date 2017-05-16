@@ -1,36 +1,39 @@
 import java.util.*;
 
-// ABC 3-C
-// http://abc003.contest.atcoder.jp/tasks/abc003_3
+// ABC 13-C
+// http://abc013.contest.atcoder.jp/tasks/abc013_3
  
 public class Main {
 	
 	public static void main (String[] args) throws java.lang.Exception {
 		Scanner in = new Scanner(System.in);
+
+		long N = in.nextLong();
+		long H = in.nextLong();
 		
-		int n = in.nextInt();
-		int k = in.nextInt();
+		long A = in.nextLong();
+		long B = in.nextLong();
+		long C = in.nextLong();
+		long D = in.nextLong();
+		long E = in.nextLong();
 		
-		int[] nums = new int[n];
-		for (int i = 0; i < n; i++) {
-			nums[i] = in.nextInt();
-		}
+		long answer = Long.MAX_VALUE;
 		
-		Arrays.sort(nums);
-		double answer = 0;
-		int index = n - 1;
-		
-		for (int i = k - 1; i >= 0; i--) {
-			int counter = 0;
-			double temp = nums[index];
-			while (counter < k - i) {
-				temp /= 2.0;
-				counter++;
+		for (int x = 0; x <= N; x++) {
+			long y = (E*N - E*x - B*x - H) / (D + E);
+			
+			if (y < 0) {
+				y = 0;
 			}
-			answer += temp;
-			index--;
+			
+			while (x + y <= N) {
+				if (B*x + D*y + H - E*(N - x - y) > 0) {
+					answer = Math.min(answer, A*x + C*y);
+					break;
+				}
+				y++;
+			}
 		}
-		
 		System.out.println(answer);
 	}
 }
