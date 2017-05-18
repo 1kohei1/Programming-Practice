@@ -62,18 +62,13 @@ public class Main {
 				
 				boolean shouldContinue = true;
 				
-//				System.out.printf("Test (%d, %d)\n", i, j);
-
 				for (int k = j - d; k <= j + d && shouldContinue; k++) {
 					int diff = K - Math.abs(j - k);
-//					System.out.printf("diff: %d. Test (%d, %d) : [%d, %d]\n", diff, i, k, whiteInRowAbove[i][k], whiteInRowBottom[i][k]);
 					if (whiteInRowAbove[i][k] < diff || whiteInRowBottom[i][k] < diff) {
 						shouldContinue = false;
 					}
 				}
 
-//				System.out.printf("%s\n", shouldContinue ? "true" : "false");
-				
 				if (shouldContinue) {
 					answer++;
 				}
@@ -81,41 +76,5 @@ public class Main {
 		}
 
 		System.out.println(answer);
-		
-		/*
- 		for (int i = 0; i < R; i++) {
-			for (int j = 0; j < C; j++) {
-				System.out.printf("[%d/%d] ", whiteInRowAbove[i][j], whiteInRowBottom[i][j]);
-			}
-			System.out.println();
-		}
-
-		long answer = 0;
-		int d = K - 1;
-
-		for (int x = 0; x < R; x++) {
-			for (int y = 0; y < C; y++) {
-				if (x - d < 0 || x + d >= R || y - d < 0 || y + d >= C) {
-					continue;
-				}
-				
-				boolean isAllWhite = true;
-				
-				for (int i = x - d; i <= x + d && isAllWhite; i++) {
-					int diff = d - Math.abs(i - x);
-					for (int j = y - diff; j <= y + diff && isAllWhite; j++) {
-						if (map[i][j] == 'x') {
-							isAllWhite = false;
-						}
-					}
-				}
-				
-				if (isAllWhite) {
-					answer++;
-				}
-			}
-		}
-		System.out.println(answer);
-		*/
 	}
 }
