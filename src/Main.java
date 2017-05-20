@@ -1,51 +1,62 @@
 import java.util.*;
 
-// ABC 62-C
-// http://abc062.contest.atcoder.jp/tasks/arc074_a
+// ABC 62-D
+// http://abc062.contest.atcoder.jp/tasks/arc074_b
  
 public class Main {
 
 	public static void main (String[] args) throws java.lang.Exception {
 		Scanner in = new Scanner(System.in);
 		
-		int h = in.nextInt();
-		int w = in.nextInt();
-
-		long answer = Long.MAX_VALUE;
-
-		// Divide vertically
-		int dividedBy3 = w / 3;
-		if (w % 3 == 0) {
-			answer = 0;
-		} else {
-			answer = Math.min(answer, h);
-		}
-
-		// Divide vertically
-		dividedBy3 = h / 3;
-		if (h % 3 == 0) {
-			answer = 0;
-		} else {
-			answer = Math.min(answer, w);
+		int N = in.nextInt();
+		int[] nums = new int[3 * N];
+		for (int i = 0; i < 3 * N; i++) {
+			nums[i] = in.nextInt();
 		}
 		
-		// Divide vertically first and divide horizontally in the first column
-		long half = w / 2;
-		for (long i = 1; i < h; i++) {
-			long max = Math.max(Math.max(half * i, (w - half) * i), w * (h - i));
-			long min = Math.min(Math.min(half * i, (w - half) * i), w * (h - i));
-			answer = Math.min(answer, max - min);
+		// Do left 
+		PriorityQueue<Integer> pq = new PriorityQueue<Integer>();
+		long sum = 0;
+		for (int i = 0; i < N; i++) {
+			pq.add(nums[i]);
+			sum += nums[i];
 		}
 		
-		// Divide horizontally first and divide vertically in the first row
-		half = h / 2;
-		for (long i = 1; i < w; i++) {
-			long max = Math.max(Math.max(half * i, (h - half) * i), (w - i) * h);
-			long min = Math.min(Math.min(half * i, (h - half) * i), (w - i) * h);
-			
-			answer = Math.min(answer, max - min);
+		long[] maxInLeft = new long[N + 1];
+		maxInLeft[0] = sum;
+		
+		for (int i = N; i < 2 * N; i++) {
+			pq.add(nums[i]);
+			sum += nums[i];
+			sum -= pq.poll();
+			maxInLeft[i - N + 1] = sum;
 		}
 		
+		
+		// Do right
+		long[] minInRight = new long[N + 1];
+		sum = 0;
+		pq = new PriorityQueue<Integer>(Collections.reverseOrder());
+		for (int i = 3 * N - 1; i >= 2 * N; i--) {
+			sum += nums[i];
+			pq.add(nums[i]);
+		}
+		
+		minInRight[N] = sum;
+		
+		for (int i = 2 * N - 1; i >= N; i--) {
+			pq.add(nums[i]);
+			sum += nums[i];
+			sum -= pq.poll();
+			minInRight[i - N] = sum;
+		}
+		
+		
+		// Calculate max in left and min in right
+		long answer = Long.MIN_VALUE;
+		for (int i = 0; i < N + 1; i++) {
+			answer = Math.max(answer, maxInLeft[i] - minInRight[i]);
+		}
 		System.out.println(answer);
 	}
 }
