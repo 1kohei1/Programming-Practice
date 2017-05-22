@@ -5,38 +5,33 @@ import java.util.*;
 
 public class Main {
 	
-	static int N;
-	static int M;
-	static int[] jewelStart;
-	static int[] jewelEnd;
-	static int[] scores;
-	
 	public static void main (String[] args) {
 		Scanner in = new Scanner(System.in);
 		
-		N = in.nextInt();
-		M = in.nextInt();
+		int N = in.nextInt();
+		int M = in.nextInt();
 		
-		jewelStart = new int[N];
-		jewelEnd = new int[N];
-		scores = new int[N];
+		long sum = 0;
+		long[] isumo = new long[M + 2];
 		
 		for (int i = 0; i < N; i++) {
-			jewelStart[i] = in.nextInt();
-			jewelEnd[i] = in.nextInt();
-			scores[i] = in.nextInt();
+			int start = in.nextInt();
+			int end = in.nextInt();
+			int score = in.nextInt();
+			
+			isumo[start] += score;
+			isumo[end + 1] -= score;
+			sum += score;
+		}
+		
+		for (int i = 1; i < M + 2; i++) {
+			isumo[i] += isumo[i - 1];
 		}
 		
 		long answer = 0;
 		
 		for (int i = 1; i <= M; i++) {
-			long num = 0;
-			for (int j = 0; j < N; j++) {
-				if (!(jewelStart[j] <= i && i <= jewelEnd[j])) {
-					num += scores[j];
-				}
-			}
-			answer = Math.max(answer, num);
+			answer = Math.max(answer, sum - isumo[i]);
 		}
 		
 		System.out.println(answer);
