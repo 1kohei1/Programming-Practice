@@ -1,7 +1,7 @@
 import java.util.*;
 
-// ABC 17-C
-// http://abc017.contest.atcoder.jp/tasks/abc017_3
+// ABC 62-D
+// http://abc062.contest.atcoder.jp/tasks/arc074_b
 
 public class Main {
 	
@@ -9,32 +9,55 @@ public class Main {
 		Scanner in = new Scanner(System.in);
 		
 		int N = in.nextInt();
-		int M = in.nextInt();
+		long[] nums = new long[3 * N];
 		
+		for (int i = 0; i < 3 * N; i++) {
+			nums[i] = in.nextLong();
+		}
+		
+		// Store the maximum sum by picking N from left array
+		long[] maxLeft = new long[3 * N];
+		PriorityQueue<Long> pq = new PriorityQueue<Long>();
 		long sum = 0;
-		long[] isumo = new long[M + 2];
 		
 		for (int i = 0; i < N; i++) {
-			int start = in.nextInt();
-			int end = in.nextInt();
-			int score = in.nextInt();
-			
-			isumo[start] += score;
-			isumo[end + 1] -= score;
-			sum += score;
+			pq.add(nums[i]);
+			sum += nums[i];
 		}
 		
-		for (int i = 1; i < M + 2; i++) {
-			isumo[i] += isumo[i - 1];
+		maxLeft[N] = sum;
+		
+		for (int i = N; i < 2 * N; i++) {
+			pq.add(nums[i]);
+			sum += nums[i];
+			sum -= pq.poll();
+			maxLeft[i + 1] = sum;
 		}
 		
-		long answer = 0;
+		// Store the minimum sum by picking N from right array
+		long[] minRight = new long[3 * N];
+		pq = new PriorityQueue<Long>(Collections.reverseOrder());
 		
-		for (int i = 1; i <= M; i++) {
-			answer = Math.max(answer, sum - isumo[i]);
+		sum = 0;
+		for (int i = 3 * N - 1; i >= 2 * N; i--) {
+			pq.add(nums[i]);
+			sum += nums[i];
+		}
+		
+		minRight[2 * N] = sum;
+		for (int i = 2 * N - 1; i >= N; i--) {
+			pq.add(nums[i]);
+			sum += nums[i];
+			sum -= pq.poll();
+			minRight[i] = sum;
+		}
+		
+		// Determine the answer
+		long answer = Long.MIN_VALUE;
+		for (int i = N; i <= 2 * N; i++) {
+			answer = Math.max(answer, maxLeft[i] - minRight[i]);
 		}
 		
 		System.out.println(answer);
 	}
-	
 }
