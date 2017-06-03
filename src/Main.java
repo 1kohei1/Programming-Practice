@@ -5,59 +5,56 @@ import java.util.*;
 
 public class Main {
 	
+	static int N;
+	static int A;
+	static int B;
+	static int[] health;
+	
 	public static void main (String[] args) {
 		Scanner in = new Scanner(System.in);
 		
-		int N = in.nextInt();
-		long[] nums = new long[3 * N];
-		
-		for (int i = 0; i < 3 * N; i++) {
-			nums[i] = in.nextLong();
-		}
-		
-		// Store the maximum sum by picking N from left array
-		long[] maxLeft = new long[3 * N];
-		PriorityQueue<Long> pq = new PriorityQueue<Long>();
+		N = in.nextInt();
+		A = in.nextInt();
+		B = in.nextInt();
+
+		health = new int[N];
 		long sum = 0;
-		
 		for (int i = 0; i < N; i++) {
-			pq.add(nums[i]);
-			sum += nums[i];
+			health[i] = in.nextInt();
+			sum += health[i];
 		}
 		
-		maxLeft[N] = sum;
+		System.out.println(solve(0, sum));
+	}
+	
+	public static long solve(long min, long max) {
+		long mid = (min + max) / 2;
 		
-		for (int i = N; i < 2 * N; i++) {
-			pq.add(nums[i]);
-			sum += nums[i];
-			sum -= pq.poll();
-			maxLeft[i + 1] = sum;
+		long answer = Long.MAX_VALUE;
+		
+		while (min <= max) {
+			mid = (min + max) / 2;
+		
+			long count = 0;
+			
+			for (int i = 0; i < N; i++) {
+				if (health[i] > mid * B) {
+					if ((health[i] - mid * B) % (A - B) == 0) {
+						count += (health[i] - mid * B) / (A - B);
+					} else {
+						count += (health[i] - mid * B) / (A - B) + 1;
+					}
+				}
+			}
+			
+			if (count <= mid) {
+				answer = Math.min(answer, mid);
+				max = mid - 1;
+			} else {
+				min = mid + 1;
+			}
 		}
 		
-		// Store the minimum sum by picking N from right array
-		long[] minRight = new long[3 * N];
-		pq = new PriorityQueue<Long>(Collections.reverseOrder());
-		
-		sum = 0;
-		for (int i = 3 * N - 1; i >= 2 * N; i--) {
-			pq.add(nums[i]);
-			sum += nums[i];
-		}
-		
-		minRight[2 * N] = sum;
-		for (int i = 2 * N - 1; i >= N; i--) {
-			pq.add(nums[i]);
-			sum += nums[i];
-			sum -= pq.poll();
-			minRight[i] = sum;
-		}
-		
-		// Determine the answer
-		long answer = Long.MIN_VALUE;
-		for (int i = N; i <= 2 * N; i++) {
-			answer = Math.max(answer, maxLeft[i] - minRight[i]);
-		}
-		
-		System.out.println(answer);
+		return answer;
 	}
 }
