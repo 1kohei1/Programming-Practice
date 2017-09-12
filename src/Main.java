@@ -1,45 +1,62 @@
 import java.util.*;
 
-// ARC 82-D
-// https://beta.atcoder.jp/contests/arc082/tasks/arc082_b
+// ARC 81-C
+// https://beta.atcoder.jp/contests/arc081/tasks/arc081_a
 
 public class Main {
 	
-	static int N;
-	static int answer = Integer.MAX_VALUE;
-
 	public static void main (String[] args) {
 		Scanner in = new Scanner(System.in);
 		
-		N = in.nextInt();
-		int[] nums = new int[N];
+		int N = in.nextInt();
+		ArrayList<Long> nums = new ArrayList<Long>();
+		HashMap<Long, Integer> count = new HashMap<Long, Integer>();
 		
 		for (int i = 0; i < N; i++) {
-			nums[i] = in.nextInt();
-		}
-		
-		int answer = 0;
-		
-		for (int i = 0; i < N; i++) {
-			if (i + 1 == nums[i]) {
-				// Not the end of the array
-				if (i != N - 1) {
-					swap(nums, i, i + 1);
-				} else {
-					swap(nums, i, i - 1);
-				}
-				answer++;
+			long n = in.nextLong();
+			
+			if (count.containsKey(n)) {
+				int c = count.get(n);
+				count.put(n, c + 1);
+			} else {
+				count.put(n, 1);
+				nums.add(n);
 			}
 		}
 		
-		System.out.println(answer);
-	}
-	
-	
-	public static void swap(int[] arr, int i, int j) {
-		int temp = arr[i];
-		arr[i] = arr[j];
-		arr[j] = temp;
+		nums.sort(null);
+		
+		long largest = -1;
+		long secondLargest = -1;
+		
+		int index = nums.size() - 1;
+		
+		while (index >= 0 && (largest == -1 || secondLargest == -1)) {
+			long len = nums.get(index);
+			int lenCount = count.get(len);
+			
+			if (lenCount >= 4) {
+				if (largest == -1) {
+					largest = len;
+					secondLargest = len;
+				} else {
+					secondLargest = len;
+				}
+			} else if (lenCount >= 2) {
+				if (largest == -1) {
+					largest = len;
+				} else {
+					secondLargest = len;
+				}
+			}
+			
+			index--;
+		}
+		
+		if (largest != -1 && secondLargest != -1) {
+			System.out.println(largest * secondLargest);
+		} else {
+			System.out.println(0);
+		}
 	}
 }
-
