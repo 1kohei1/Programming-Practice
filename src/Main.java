@@ -1,37 +1,54 @@
 import java.util.*;
 
-// ARC 80-C
-// http://arc080.contest.atcoder.jp/tasks/arc080_a
+// ARC 80-D
+// http://arc080.contest.atcoder.jp/tasks/arc080_b
 
 public class Main {
 	
 	public static void main (String[] args) throws InterruptedException {
 		Scanner in = new Scanner(System.in);
 		
+		int H = in.nextInt();
+		int W = in.nextInt();
 		int N = in.nextInt();
-		int num4 = 0;
-		int num2 = 0;
 		
+		int[] color = new int[N];
 		for (int i = 0; i < N; i++) {
-			int n = in.nextInt();
-			if (n % 4 == 0) {
-				num4++;
-			} else if (n % 2 == 0) {
-				num2++;
-			}
+			color[i] = in.nextInt();
 		}
 		
-		String answer = "No";
+		int row = 0;
+		int col = 0;
+		int colorIndex = 0;
+		boolean toRight = true;
 		
-		if (num4 >= N / 2) {
-			answer = "Yes";
-		} else {
-			int remain = N - num4 * 2;
-			if (remain <= num2) {
-				answer = "Yes";
+		while (row < H) {
+			String s = "";
+			if (toRight) {
+				while (col < W) {
+					if (color[colorIndex] == 0) {
+						colorIndex++;
+					}
+					s += (colorIndex + 1) + " ";
+					color[colorIndex]--;
+					col++;
+				}
+				col--;
+				toRight = false;
+			} else {
+				while (0 <= col) {
+					if (color[colorIndex] == 0) {
+						colorIndex++;
+					}
+					s = (colorIndex + 1) + " " + s;
+					color[colorIndex]--;
+					col--;
+				}
+				col++;
+				toRight = true;
 			}
+			row++;
+			System.out.println(s);
 		}
-		
-		System.out.println(answer);
 	}
 }
