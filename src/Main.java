@@ -1,54 +1,39 @@
 import java.util.*;
 
-// ARC 80-D
-// http://arc080.contest.atcoder.jp/tasks/arc080_b
+// ARC 79-C
+// http://arc079.contest.atcoder.jp/tasks/arc079_a
 
 public class Main {
 	
 	public static void main (String[] args) throws InterruptedException {
 		Scanner in = new Scanner(System.in);
 		
-		int H = in.nextInt();
-		int W = in.nextInt();
 		int N = in.nextInt();
+		int M = in.nextInt();
 		
-		int[] color = new int[N];
-		for (int i = 0; i < N; i++) {
-			color[i] = in.nextInt();
-		}
+		Set<Integer> from1 = new TreeSet<Integer>();
+		Set<Integer> toN = new TreeSet<Integer>();
 		
-		int row = 0;
-		int col = 0;
-		int colorIndex = 0;
-		boolean toRight = true;
-		
-		while (row < H) {
-			String s = "";
-			if (toRight) {
-				while (col < W) {
-					if (color[colorIndex] == 0) {
-						colorIndex++;
-					}
-					s += (colorIndex + 1) + " ";
-					color[colorIndex]--;
-					col++;
-				}
-				col--;
-				toRight = false;
-			} else {
-				while (0 <= col) {
-					if (color[colorIndex] == 0) {
-						colorIndex++;
-					}
-					s = (colorIndex + 1) + " " + s;
-					color[colorIndex]--;
-					col--;
-				}
-				col++;
-				toRight = true;
+		for (int i = 0; i < M; i++) {
+			int s = in.nextInt();
+			int g = in.nextInt();
+			
+			if (s == 1 && !from1.contains(g)) {
+				from1.add(g);
+			} else if (g == N && !toN.contains(s)) {
+				toN.add(s);
 			}
-			row++;
-			System.out.println(s);
 		}
+		
+		String answer = "IMPOSSIBLE";
+
+		for (int island: from1) {
+			if (toN.contains(island)) {
+				answer = "POSSIBLE";
+				break;
+			}
+		}
+				
+		System.out.println(answer);
 	}
 }
