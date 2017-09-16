@@ -1,81 +1,97 @@
 import java.util.*;
 
-// ARC 83-C
-// http://arc083.contest.atcoder.jp/tasks/arc083_a
+// ARC 83-D
+// http://arc083.contest.atcoder.jp/tasks/arc083_b
 
 public class Main {
-	
-	static int A;
-	static int B;
-	static int C;
-	static int D;
-	static int E;
-	static int F;
-	
-	static double concentration = 0;
-	static int answerW = 0;
-	static int answerS = 0;
-	
-	static int[][] dp;
 	
 	public static void main (String[] args) throws InterruptedException {
 		Scanner in = new Scanner(System.in);
 		
-		A = in.nextInt();
-		B = in.nextInt();
-		C = in.nextInt();
-		D = in.nextInt();
-		E = in.nextInt();
-		F = in.nextInt();
+		int N = in.nextInt();
 		
-		dp = new int[F + 1][F * E / 100 + 1];
-		
-		answerW = 100 * A;
-		
-		solve(0, 0);
-		
-		System.out.printf("%d %d\n", answerW + answerS, answerS);
-	}
-	
-	public static void solve(int water, int sugar) {
-		if (water + sugar > F || water > F || sugar > F * E / 100) {
-			return;
-		}
-		if (dp[water][sugar] == 1) {
-			return;
+		int[][] givenMap = new int[N][N];
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < N; j++) {
+				givenMap[i][j] = in.nextInt();
+			}
 		}
 		
-		boolean isSugarDissolved = isSugarDissolved(water, sugar);
-		if (isSugarDissolved) {
-			double conc = calculateConcentration(water, sugar);
-			if (conc > concentration) {
-				concentration = conc;
-				answerW = water;
-				answerS = sugar;
+		long[][] map = new long[N][N];
+		for (int i = 0; i < N; i++) {
+			Arrays.fill(map[i], Long.MAX_VALUE / 2);
+		}
+		
+		long sumPath = 0;
+		
+		for (int i = 0; i < N; i++) {
+			for (int j = i + 1; j < N; j++) {
+				boolean altPathFound = false;
+				for (int k = 0; k < N && !altPathFound; k++) {
+					if (k != i && k != j && givenMap[i][k] + givenMap[k][j] == givenMap[i][j]) {
+						altPathFound = true;
+					}
+				}
+				
+				if (altPathFound) {
+					// Do nothing. i <-> j can be achieved by different path
+				} else {
+					map[i][j] = givenMap[i][j];
+					map[j][i] = givenMap[i][j];
+					sumPath += givenMap[i][j];
+				}
+			}
+		}
+		
+		for (int k = 0; k < N; k++) {
+			for (int i = 0; i < N; i++) {
+				for (int j = 0; j < N; j++) {
+					if (i != j && j != k && k != i) {
+						map[i][j] = Math.min(map[i][j], map[i][k] + map[k][j]);
+					}
+				}
 			}
 		}
 
-		dp[water][sugar] = 1;
-				
-		// Operation 1
-		solve(water + 100 * A, sugar);
-		// Operation 2
-		solve(water + 100 * B, sugar);
+		boolean graphExists = true;
+		for (int i = 0; i < N && graphExists; i++) {
+			for (int j = i + 1; j < N && graphExists; j++) {
+				if (i != j && map[i][j] != givenMap[i][j]) {
+					graphExists  = false;
+				}
+			}
+		}
 		
-		// Only sugar is dissolved, check adding sugar
-		if (isSugarDissolved) {
-			// Operation 3
-			solve(water, sugar + C);
-			// Operation 4
-			solve(water, sugar + D);
+		if (graphExists) {
+			System.out.println(sumPath);
+		} else {
+			System.out.println(-1);
 		}
 	}
 	
-	public static double calculateConcentration(int water, int sugar) {
-		return (100.0 * sugar) / (water + sugar);
+	public static void print2DArray(int[][] arr) {
+		for (int i = 0; i < arr.length; i++) {
+			for (int j = 0; j < arr[i].length; j++) {
+				System.out.printf("%d ", arr[i][j]);
+			}
+			System.out.println();
+		}
 	}
 	
-	public static boolean isSugarDissolved(int water, int sugar) {
-		return sugar <= water * E / 100;
+	public static void print2DArray(long[][] arr) {
+		for (int i = 0; i < arr.length; i++) {
+			for (int j = 0; j < arr[i].length; j++) {
+				System.out.printf("%d ", arr[i][j]);
+			}
+			System.out.println();
+		}
 	}
 }
+/**
+5
+0 1 2 3 2
+1 0 1 2 3
+2 1 0 1 2
+3 2 1 0 1
+2 3 2 1 0
+*/
