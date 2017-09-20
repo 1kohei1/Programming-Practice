@@ -1,7 +1,7 @@
 import java.util.*;
 
-// ARC 78-C
-// http://arc078.contest.atcoder.jp/tasks/arc078_a
+// ARC 77-C
+// http://arc077.contest.atcoder.jp/tasks/arc077_a
 
 public class Main {
 	
@@ -9,19 +9,24 @@ public class Main {
 		Scanner in = new Scanner(System.in);
 		
 		int N = in.nextInt();
-		long[] sum = new long[N + 1];
+		int[] nums = new int[N];
 		
 		for (int i = 0; i < N; i++) {
-			int n = in.nextInt();
-			sum[i + 1] = sum[i] +  n;
+			nums[i] = in.nextInt();
 		}
 		
-		long answer = Long.MAX_VALUE;
-		for (int i = 1; i < N; i++) {
-			long remain = sum[N] - sum[i];
-			answer = Math.min(answer, Math.abs(remain - sum[i]));
+		int index = N - 1;
+		StringBuilder s = new StringBuilder();
+		while (index >= 0) {
+			s.append(nums[index] + " ");
+			index -= 2;
 		}
-		System.out.println(answer);
+		index = N % 2;
+		while (index < N) {
+			s.append(nums[index] + " ");
+			index += 2;
+		}
+		System.out.println(s);
 	}
 	
 }
