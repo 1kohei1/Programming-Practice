@@ -1,7 +1,7 @@
 import java.util.*;
 
-// CODEFES 2017.qualA-C
-// http://code-festival-2017-quala.contest.atcoder.jp/tasks/code_festival_2017_quala_c
+// CODEFES 2017.qualA-D
+// http://code-festival-2017-quala.contest.atcoder.jp/tasks/code_festival_2017_quala_d
 
 public class Main {
 	
@@ -10,66 +10,117 @@ public class Main {
 		
 		int H = in.nextInt();
 		int W = in.nextInt();
+		int d = in.nextInt();
 		
-		int[] freq = new int[26];
-		for (int i = 0; i < H; i++) {
-			char[] c = in.next().toCharArray();
-			for (int j = 0; j < c.length; j++) {
-				freq[c[j] - 'a']++;
+		StringBuilder answer = new StringBuilder();
+		
+		if (d == 1) {
+			char[][] color = new char[][]{{'R', 'G'}, {'G', 'R'}};
+			for (int i = 0; i < H; i++) {
+				for (int j = 0; j < W; j++) {
+					answer.append(color[i % 2][j % 2]);
+				}
+				answer.append("\n");
 			}
-		}
-		
-		if (H == 1 || W == 1) {
-			int numRemaining = 0;
-			int index = 0;
-			while (index < 26) {
-				if (freq[index] >= 2) {
-					freq[index] -= 2;
-				} else {
-					numRemaining += freq[index];
-					index++;
+		} else if (d == 2) {
+			char[][] color = new char[][]{
+				{'R', 'R', 'B', 'B'}, 
+				{'G', 'G', 'Y', 'Y'}, 
+				{'B', 'B', 'R', 'R'},
+				{'Y', 'Y', 'G', 'G'}
+			};
+			
+			for (int i = 0; i < H; i++) {
+				for (int j = 0; j < W; j++) {
+					answer.append(color[i % 4][j % 4]);
+				}
+				answer.append("\n");
+			}
+		} else if (d % 2 == 1) {
+			char[][] color = new char[2 * d][2 * d];
+			
+			char[] gr = new char[]{'G', 'R'};
+			char[] by = new char[]{'B', 'Y'};
+			
+			for (int x = 0; x < 2; x++) {
+				for (int y = 0; y < 2; y++) {
+					int offset = (x + y) % 2;
+					
+					for (int j = 0; j < d; j++) {
+						int numBY = Math.min(j,  d - j);
+						int index = 0;
+						while (index < numBY) {
+							color[index + d * x][j + d * y] = by[offset];
+							index++;
+						}
+						int numGR = d - 2 * numBY;
+						while (index < numBY + numGR) {
+							if (j <= d / 2) {
+								color[index + d * x][j + d * y] = gr[offset];
+							} else {
+								color[index + d * x][j + d * y] = gr[(offset + 1) % 2];
+							}
+							
+							index++;
+						}
+						
+						while (index < d) {
+							color[index + d * x][j + d * y] = by[(offset + 1) % 2];
+							index++;
+						}
+					}
 				}
 			}
 			
-			System.out.println(numRemaining == Math.max(H,  W) % 2 ? "Yes" : "No");
+			for (int i = 0; i < H; i++) {
+				for (int j = 0; j < W; j++) {
+					answer.append(color[i % (2 * d)][j % (2 * d)]);
+				}
+				answer.append("\n");
+			}
 		} else {
-			int num2Ok = 0;
-			int num1Ok = 0;
+			char[][] color = new char[2 * d][2 * d];
 			
-			if (H % 2 == 1) {
-				num2Ok += W / 2;
-			}
-			if (W % 2 == 1) {
-				num2Ok += H / 2;
-			}
-			if (H % 2 == 1 && W % 2 == 1) {
-				num1Ok = 1;
-			}
+			char[] rg = new char[]{'R', 'G'};
+			char[] by = new char[]{'B', 'Y'};
 			
-//			System.out.printf("num2Ok: %d, num1Ok: %d\n", num2Ok, num1Ok);
-			
-			int index = 0;
-			boolean answer = true;
-			while (index < 26 && answer) {
-//				System.out.printf("index: %d, freq[index]: %d\n", index, freq[index]);
-				if (freq[index] >= 4) {
-					freq[index] -= 4;
-				} else if (freq[index] == 2 && num2Ok > 0) {
-					freq[index] -= 2;
-					num2Ok--;
-					index++;
-				} else if (freq[index] == 1 && num1Ok > 0) {
-					freq[index] -= 1;
-					num1Ok--;
-					index++;
-				} else if (freq[index] == 0) {
-					index++;
-				} else {
-					answer = false;
+			for (int x = 0; x < 2; x++) {
+				for (int y = 0; y < 2; y++) {
+					int offset = (x + y) % 2;
+					
+					for (int j = 0; j < d; j++) {
+						int numRG = Math.abs(j - d / 2);
+						int rgOffset = offset;
+						if (j >= d / 2) {
+							numRG++;
+							rgOffset = (rgOffset + 1) % 2;
+						}
+						int otherNumRG = numRG - 1;
+						
+						int index = 0;
+						while (index < numRG) {
+							color[index + d * x][j + d * y] = rg[rgOffset];
+							index++;
+						}
+						while (index + otherNumRG < d) {
+							color[index + d * x][j + d * y] = by[offset];
+							index++;
+						}
+						while (index < d) {
+							color[index + d * x][j + d * y] = rg[(rgOffset + 1) % 2];
+							index++;
+						}
+					}
 				}
 			}
-			System.out.println(answer ? "Yes" : "No");
+			
+			for (int i = 0; i < H; i++) {
+				for (int j = 0; j < W; j++) {
+					answer.append(color[i % (2 * d)][j % (2 * d)]);
+				}
+				answer.append("\n");
+			}
 		}
+		System.out.println(answer);
 	}
-	
 }
