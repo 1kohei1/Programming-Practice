@@ -1,29 +1,42 @@
 import java.util.*;
 
-// Yuki 141
-// https://yukicoder.me/problems/no/131
+// Tenakaichi 2017-C
+// http://tenka1-2017.contest.atcoder.jp/tasks/tenka1_2017_c	
 
 public class Main {
 	
 	public static void main (String[] args) throws InterruptedException {
 		Scanner in = new Scanner(System.in);
 		
-		int x = in.nextInt();
-		int y = in.nextInt();
-		int d = in.nextInt();
+		double E = 1e-9;
 		
-		int answer = 0;
-		if (d <= y) {
-			answer = Math.min(d,  x) + 1;
-		} else if (d <= x) {
-			answer = Math.min(d, y) + 1;
-		} else {
-			int crossX = d - y;
-			if (0 <= crossX && crossX <= x) {
-				int crossY = 0 - x + d;
-				answer = y - crossY + 1;
+		double N = in.nextDouble();
+		boolean answerFound = false;
+		double d = 4 / N;
+		
+		for (double i = 3500; i > 0 && 1 / i < d && !answerFound; i--) {
+			double dd = d - 1 / i;
+			
+			for (double j = 3500; j > 0 && 1 / j < dd && !answerFound; j--) {
+				double ddd = dd - 1 / j;
+				
+				double x = 1 / ddd;
+				int k = 0;
+				
+				if (Math.abs(Math.ceil(x) - x) <= E) {
+					k = (int) Math.ceil(x);
+					answerFound = true;
+				} else if (Math.abs(Math.floor(x) - x) <= E) {
+					k = (int) Math.floor(x);
+					answerFound = true;
+				}
+				
+				if (answerFound) {
+					System.out.printf("%d %d %d\n", (int) i, (int) j, k);
+				}
 			}
 		}
-		System.out.println(answer);
 	}
+	
+	
 }
