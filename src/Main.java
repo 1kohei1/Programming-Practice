@@ -1,47 +1,82 @@
 import java.util.*;
 
-// Tenakaichi 2017-D
-// http://tenka1-2017.contest.atcoder.jp/tasks/tenka1_2017_d	
+// DDCC 2017-D
+// http://ddcc2017-qual.contest.atcoder.jp/tasks/ddcc2017_qual_d	
 
 public class Main {
 
 	public static void main (String[] args) throws InterruptedException {
 		Scanner in = new Scanner(System.in);
 
-		int N = in.nextInt();
-		int K = in.nextInt();
-
-		int[] nums = new int[N];
-		int[] values = new int[N];
+		int H = in.nextInt();
+		int W = in.nextInt();
+		int A = in.nextInt();
+		int B = in.nextInt();
 		
-		for (int i = 0; i < N; i++) {
-			nums[i] = in.nextInt();
-			values[i] = in.nextInt();
-		}
-
-		long answer = 0;
+		int[][] map = new int[H][W];
+		int numStones = 0;
 		
-		for (int i = -1; i < 32; i++) {
-			if (i == -1 || ((1 << i) & K) > 0) {
-				long tempAnswer = 0;
-				for (int j = 0; j < N; j++) {
-					if (i == -1 || (nums[j] & (1 << i)) == 0) {
-						boolean shouldAdd = true;
-						for (int k = i + 1; k < 32; k++) {
-							if ((K & (1 << k)) == 0 && (nums[j] & (1 << k)) > 0) {
-								shouldAdd = false;
-								break;
-							}
-						}
-						
-						if (shouldAdd) {
-							tempAnswer += values[j];
-						}
-					}
+		for (int i = 0; i < H; i++) {
+			char[] c = in.next().toCharArray();
+			for (int j = 0; j < W; j++) {
+				if (c[j] == 'S') {
+					map[i][j] = 1;
+					numStones++;
 				}
-				answer = Math.max(answer, tempAnswer);
 			}
 		}
+		
+		int cornerPair = 0;
+		int tatePair = 0;
+		int yokoPair = 0;
+		
+		for (int i = 0; i < H / 2; i++) {
+			for (int j = 0; j < W / 2; j++) {
+				int curr = map[i][j];
+				int yoko = map[i][W - j - 1];
+				int tate = map[H - i - 1][j];
+				int oku = map[H - i - 1][W - j - 1];
+				
+				if (curr == 1 && yoko == 1 && tate == 1 && oku == 1) {
+					cornerPair++;
+				} else {
+					if ((curr == 1 && yoko == 1) || (tate == 1 && oku == 1)) {
+						yokoPair++;
+					}
+					if ((curr == 1 && tate == 1) || (yoko == 1 && oku == 1)) {
+							tatePair++;
+					}
+				}
+			}
+		}
+		
+		// 石を一つ取り、ペアが崩れる可能性を考える
+		if (cornerPair * 4 + (tatePair + yokoPair) * 2 == numStones) {
+			if (tatePair + yokoPair > 0) {
+				if (A < B) {
+					if (tatePair > 0) {
+						tatePair--;
+					} else {
+						yokoPair--;
+					}
+				} else {
+					if (yokoPair > 0) {
+						yokoPair--;
+					} else {
+						tatePair--;
+					}
+				}
+			} else {
+				cornerPair--;
+				if (A > B) {
+					tatePair++;
+				} else {
+					yokoPair++;
+				}
+			}
+		}
+		
+		int answer = (A + B + Math.max(A, B)) * cornerPair + Math.max(A * tatePair, B * yokoPair) + A + B;
 		System.out.println(answer);
 	}
 }
