@@ -1,82 +1,77 @@
 import java.util.*;
 
-// DDCC 2017-D
-// http://ddcc2017-qual.contest.atcoder.jp/tasks/ddcc2017_qual_d	
+// CODEFES_B 2017-C
+// http://code-festival-2017-qualb.contest.atcoder.jp/tasks/code_festival_2017_qualb_c	
 
 public class Main {
 
 	public static void main (String[] args) throws InterruptedException {
 		Scanner in = new Scanner(System.in);
-
-		int H = in.nextInt();
-		int W = in.nextInt();
-		int A = in.nextInt();
-		int B = in.nextInt();
 		
-		int[][] map = new int[H][W];
-		int numStones = 0;
+		int N = in.nextInt();
+		int M = in.nextInt();
 		
-		for (int i = 0; i < H; i++) {
-			char[] c = in.next().toCharArray();
-			for (int j = 0; j < W; j++) {
-				if (c[j] == 'S') {
-					map[i][j] = 1;
-					numStones++;
+		ArrayList<ArrayList<Integer>> map = new ArrayList<ArrayList<Integer>>();
+		for (int i = 0; i < N; i++) {
+			map.add(new ArrayList<Integer>());
+		}
+		
+		ArrayList<Path> q = new ArrayList<Path>();
+		
+		for (int i = 0; i < M; i++) {
+			int a = in.nextInt() - 1;
+			int b = in.nextInt() - 1;
+			map.get(a).add(b);
+			map.get(b).add(a);
+			q.add(new Path(a, b));
+		}
+		
+		long answer = 0;
+		
+		while (q.size() > 0) {
+			Path p = q.remove(0);
+			int start = p.start;
+			int end = p.end;
+			
+			for (int i = 0; i < map.get(start).size(); i++) {
+				for (int j = 0; j < map.get(end).size(); j++) {
+					int point1 = map.get(start).get(i);
+					int point2 = map.get(end).get(j);
+					
+					if (point1 != point2 && point1 != start && point1 != end && point2 != start && point2 != end && map.get(point1).indexOf(point2) == -1) {
+						map.get(point1).add(point2);
+						map.get(point2).add(point1);
+						Path newP = new Path(point1, point2);
+						if (!q.contains(newP)) {
+							q.add(newP);
+						}
+						answer++;
+					}
 				}
 			}
 		}
-		
-		int cornerPair = 0;
-		int tatePair = 0;
-		int yokoPair = 0;
-		
-		for (int i = 0; i < H / 2; i++) {
-			for (int j = 0; j < W / 2; j++) {
-				int curr = map[i][j];
-				int yoko = map[i][W - j - 1];
-				int tate = map[H - i - 1][j];
-				int oku = map[H - i - 1][W - j - 1];
-				
-				if (curr == 1 && yoko == 1 && tate == 1 && oku == 1) {
-					cornerPair++;
-				} else {
-					if ((curr == 1 && yoko == 1) || (tate == 1 && oku == 1)) {
-						yokoPair++;
-					}
-					if ((curr == 1 && tate == 1) || (yoko == 1 && oku == 1)) {
-							tatePair++;
-					}
-				}
-			}
-		}
-		
-		// 石を一つ取り、ペアが崩れる可能性を考える
-		if (cornerPair * 4 + (tatePair + yokoPair) * 2 == numStones) {
-			if (tatePair + yokoPair > 0) {
-				if (A < B) {
-					if (tatePair > 0) {
-						tatePair--;
-					} else {
-						yokoPair--;
-					}
-				} else {
-					if (yokoPair > 0) {
-						yokoPair--;
-					} else {
-						tatePair--;
-					}
-				}
-			} else {
-				cornerPair--;
-				if (A > B) {
-					tatePair++;
-				} else {
-					yokoPair++;
-				}
-			}
-		}
-		
-		int answer = (A + B + Math.max(A, B)) * cornerPair + Math.max(A * tatePair, B * yokoPair) + A + B;
 		System.out.println(answer);
 	}
+}
+
+class Path {
+	int start;
+	int end;
+	
+	public Path(int start, int end) {
+		this.start = Math.min(start, end);
+		this.end = Math.max(start, end);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Path) {
+			Path p = (Path) obj;
+			return p.start == this.start && p.end == this.end;
+		} else {
+			return false;
+		}
+	}
+	
+	
 }
