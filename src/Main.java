@@ -4,74 +4,72 @@ import java.util.*;
 // http://code-festival-2017-qualb.contest.atcoder.jp/tasks/code_festival_2017_qualb_c	
 
 public class Main {
+	
+	static int N;
+
+	static boolean isBipartite = true;
+	static int[] color;
+	static ArrayList<ArrayList<Integer>> map;
 
 	public static void main (String[] args) throws InterruptedException {
 		Scanner in = new Scanner(System.in);
 		
-		int N = in.nextInt();
+		N = in.nextInt();
 		int M = in.nextInt();
 		
-		ArrayList<ArrayList<Integer>> map = new ArrayList<ArrayList<Integer>>();
+		map = new ArrayList<ArrayList<Integer>>();
+		color = new int[N];
+		
 		for (int i = 0; i < N; i++) {
 			map.add(new ArrayList<Integer>());
 		}
-		
-		ArrayList<Path> q = new ArrayList<Path>();
 		
 		for (int i = 0; i < M; i++) {
 			int a = in.nextInt() - 1;
 			int b = in.nextInt() - 1;
 			map.get(a).add(b);
 			map.get(b).add(a);
-			q.add(new Path(a, b));
 		}
 		
-		long answer = 0;
-		
-		while (q.size() > 0) {
-			Path p = q.remove(0);
-			int start = p.start;
-			int end = p.end;
-			
-			for (int i = 0; i < map.get(start).size(); i++) {
-				for (int j = 0; j < map.get(end).size(); j++) {
-					int point1 = map.get(start).get(i);
-					int point2 = map.get(end).get(j);
-					
-					if (point1 != point2 && point1 != start && point1 != end && point2 != start && point2 != end && map.get(point1).indexOf(point2) == -1) {
-						map.get(point1).add(point2);
-						map.get(point2).add(point1);
-						Path newP = new Path(point1, point2);
-						if (!q.contains(newP)) {
-							q.add(newP);
-						}
-						answer++;
-					}
+		isBipartite(0, 1);
+		if (isBipartite) {
+			long numBlack = 0;
+			long numWhite = 0;
+			for (int i = 0; i < N; i++) {
+				if (color[i] == 1) {
+					numBlack++;
+				} else if (color[i] == 2){
+					numWhite++;
 				}
 			}
-		}
-		System.out.println(answer);
-	}
-}
-
-class Path {
-	int start;
-	int end;
-	
-	public Path(int start, int end) {
-		this.start = Math.min(start, end);
-		this.end = Math.max(start, end);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof Path) {
-			Path p = (Path) obj;
-			return p.start == this.start && p.end == this.end;
+			System.out.println(numBlack * numWhite - M);
 		} else {
-			return false;
+			System.out.println(((long) N) * ((long) (N - 1)) / 2 - M);
 		}
 	}
 	
-	
+	public static void isBipartite(int index, int fillColor) {
+		if (!isBipartite) {
+			return;
+		}
+		if (color[index] == 0) {
+			color[index] = fillColor;
+		}
+		
+		ArrayList<Integer> queue = new ArrayList<Integer>();
+		
+		for (int i = 0; i < map.get(index).size(); i++) {
+			int newIndex = map.get(index).get(i);
+			if (color[index] == color[newIndex]) {
+				isBipartite = false;
+			} else if (color[newIndex] == 0) {
+				queue.add(newIndex);
+			}
+		}
+		
+		while (queue.size() > 0) {
+			int newIndex = queue.remove(0);
+			isBipartite(newIndex, fillColor % 2 + 1);
+		}
+	}
 }
