@@ -1,12 +1,10 @@
 import java.util.*;
-import java.awt.Point;
-import java.math.BigInteger;
 
-// Google foo.bar
+// Google foo.bar level 3: Doomsday Fuel
 
 public class Main {
 	
-	public static void main (String[] args) throws InterruptedException {
+	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
 
 		int n = in.nextInt();
@@ -20,140 +18,188 @@ public class Main {
 		for (int i = 0; i < answer.length; i++) {
 			System.out.printf("%d ", answer[i]);
 		}
+
+//		Fraction[][] map1 = new Fraction[][]{
+//			{new Fraction(1, 1), new Fraction(2,1)},
+//			{new Fraction(0, 1), new Fraction(1, 1)}
+//		};
+//		Fraction[][] map2 = new Fraction[][]{
+//			{new Fraction(3, 1), new Fraction(4, 1), new Fraction(0, 1)},
+//			{new Fraction(1, 1), new Fraction(2, 1), new Fraction(3, 1)}
+//		};
+//		Utility.print2DFraction(Utility.multiply(map1, map2));
+		
+//		Fraction[][] fmap = new Fraction[n][n];
+//		for (int i = 0; i < n; i++) {
+//			for (int j = 0; j < n; j++) {
+//				fmap[i][j] = new Fraction(in.nextLong(), 1);
+//			}
+//		}
+//		
+//		System.out.println("Inverse");
+//		Utility.print2DFraction(Utility.inverse(fmap));
 	}
 	
 	public static int[] answer(int[][] m) {
-		boolean[] isTerminate = new boolean[m.length];
-		Fraction[][] dist = new Fraction[m.length][m.length];
-		Fraction[] loop = new Fraction[m.length];
-		Fraction[] answer = new Fraction[m.length];
+		int len = m.length;
 		
-		for (int i = 0; i < m.length; i++) {
-			loop[i] = null;
-			answer[i] = null;
+		boolean[] isAbsorbing = new boolean[len];
+		int numAbsorbingNode = 0;
+		Fraction[][] fmap = new Fraction[len][len];
+		
+		// Convert to fraction map
+		for (int i = 0; i < len; i++) {
 			int sum = 0;
-
-			for (int j = 0; j < m[i].length; j++) {
+			for (int j = 0; j < len; j++) {
 				sum += m[i][j];
 			}
+			
+			for (int j = 0; j < len; j++) {
+				if (sum == 0 && i == j) {
+					fmap[i][j] = new Fraction(1, 1);
+				} else if (sum == 0) {
+					fmap[i][j] = new Fraction(m[i][j], 1);
+				} else {
+					fmap[i][j] = new Fraction(m[i][j], sum);
+				}
+			}
+			
 			if (sum == 0) {
-				isTerminate[i] = true;
-			} else {
-				for (int j = 0; j < m[i].length; j++) {
-					if (m[i][j] > 0) {
-						Fraction f = new Fraction(m[i][j], sum);
-						dist[i][j] = f;
+				isAbsorbing[i] = true;
+				numAbsorbingNode++;
+			}
+		}
+		
+		if (isAbsorbing[0]) {
+			return new int[]{1, 1};
+		}
+		
+//		System.out.println("fmap");
+//		Utility.print2DFraction(fmap);
+		
+		// Get Q, R, I in canonical form
+		Fraction[][] Q = new Fraction[len - numAbsorbingNode][len - numAbsorbingNode];
+		Fraction[][] R = new Fraction[len - numAbsorbingNode][numAbsorbingNode];
+		Fraction[][] I = new Fraction[numAbsorbingNode][numAbsorbingNode];
+		
+		int qrRowIndex = 0;
+		int iRowIndex = 0;
+		
+		for (int i = 0; i < len; i++) {
+			if (!isAbsorbing[i]) {
+				int qColIndex = 0;
+				int rColIndex = 0;
+				for (int j = 0; j < len; j++) {
+					if (!isAbsorbing[j]) {
+						Q[qrRowIndex][qColIndex] = fmap[i][j];
+						qColIndex++;
+					} else {
+						R[qrRowIndex][rColIndex] = fmap[i][j];
+						rColIndex++;
 					}
 				}
+				qrRowIndex++;
+			} else {
+				int iColIndex = 0;
+				for (int j = 0; j < len; j++) {
+					if (isAbsorbing[j]) {
+						I[iRowIndex][iColIndex] = fmap[i][j];
+						iColIndex++;
+					}
+				}
+				iRowIndex++;
 			}
 		}
-//		print2DFraction(dist);
 		
-		ArrayList<Integer> path = new ArrayList<Integer>();
-		dfs(dist, loop, 0, isTerminate, answer, path);
+//		System.out.println("Q");
+//		Utility.print2DFraction(Q);
+//		System.out.println("R");
+//		Utility.print2DFraction(R);
+//		System.out.println("I");
+//		Utility.print2DFraction(I);
+
+		// Calculate I - Q to get inverse of I - Q
+		int iMinusQLen = len - numAbsorbingNode;
+		Fraction[][] iMinusQ = new Fraction[iMinusQLen][iMinusQLen];
 		
-//		print1DFraction(loop);
-//		print1DFraction(answer);
+		for (int i = 0; i < iMinusQLen ; i++) {
+			for (int j = 0; j < iMinusQLen ; j++) {
+				Fraction f1 = new Fraction(0, 1);
+				if (i == j) {
+					f1 = new Fraction(1, 1);
+				}
+				Fraction f2 = Q[i][j];
+				iMinusQ[i][j] = Utility.subtract(f1, f2);
+			}
+		}
+		
+		Fraction[][] N = Utility.inverse(iMinusQ);
+		
+//		System.out.println("iMinusQ");
+//		Utility.print2DFraction(iMinusQ);
+//		System.out.println("N");
+//		Utility.print2DFraction(N);
+		
+		// Calculate probabilities at each terminate state
+		Fraction[][] probabilities = Utility.multiply(N, R);
+		int[] answer = new int[probabilities[0].length + 1];
 		
 		long lcm = 1;
-		int terminateCount = 0;
-		for (int i = 0; i < m.length; i++) {
-			if (isTerminate[i]) {
-				terminateCount++;
-				if (answer[i] != null) {
-					lcm = lcm(lcm, answer[i].denominator);
-				}
-			}
-		}
 		
-		int[] returnArr = new int[terminateCount + 1];
-		int index = 0;
-		for (int i = 0; i < m.length; i++) {
-			if (isTerminate[i]) {
-				if (answer[i] == null) {
-					returnArr[index] = 0;
-				} else {
-					returnArr[index] = (int) (answer[i].numerator * (lcm / answer[i].denominator));
-				}
-				index++;
-			}
+		for (int i = 0; i < probabilities[0].length; i++) {
+			lcm = Utility.lcm(lcm, probabilities[0][i].denominator);
 		}
-		returnArr[index] = (int) lcm;
+		for (int i = 0; i < probabilities[0].length; i++) {
+			Fraction f = probabilities[0][i];
+			answer[i] = (int) (lcm / f.denominator * f.numerator);
+		}
+		answer[probabilities[0].length] = (int) lcm;
 		
-		return returnArr;
+		return answer;
+	}
+}
+
+class Fraction {
+	long numerator;
+	long denominator;
+	
+	public Fraction(long n, long d) {
+		this.numerator = n;
+		this.denominator = d;
+		
+		if (this.denominator < 0) {
+			this.numerator *= -1;
+			this.denominator *= -1;
+		}
+		if (this.numerator == 0) {
+			this.denominator = 1;
+		}
+		this.simplify();
 	}
 	
-	public static void dfs(Fraction[][] dist, Fraction[] loop, int index, boolean[] isTerminate, Fraction[] answer, ArrayList<Integer> path) {
-		int pathIndex = path.indexOf(index);
-		
-		if (pathIndex >= 0) {
-			path.add(index);
-			Fraction f = new Fraction(1, 1);
-			for (int i = pathIndex + 1; i < path.size(); i++) {
-				f.multiply(dist[path.get(i - 1)][path.get(i)]);
-			}
-			
-			f.calculateForLoop();
-			
-			if (loop[index] == null) {
-				loop[index] = f;
-			} else {
-				loop[index].multiply(f);
-			}
-			path.remove(path.size() - 1);
-			return;
-		}
-		
-		path.add(index);
-		
-		for (int i = 0; i < dist[index].length; i++) {
-			if (dist[index][i] != null) {
-				dfs(dist, loop, i, isTerminate, answer, path);
-			}
-		}
-		if (isTerminate[index]) {
-			Fraction f = new Fraction(1, 1);
-			for (int i = 0; i < path.size() - 1; i++) {
-				int currentNode = path.get(i);
-				if (loop[currentNode] != null) {
-					f.multiply(loop[currentNode]);
-				}
-				f.multiply(dist[currentNode][path.get(i + 1)]);
-			}
-			if (answer[index] == null) {
-				answer[index] = f;
-			} else {
-				answer[index].add(f);
-			}
-		}
-		path.remove(path.size() - 1);
-	}
-	
-	public static void print2DFraction(Fraction[][] f) {
-		for (int i = 0; i < f.length; i++) {
-			for (int j = 0; j < f[i].length; j++) {
-				if (f[i][j] != null) {
-					System.out.printf("[%d][%d]: %s\n", i, j, f[i][j]);
-				}
-			}
+	public void simplify() {
+		long gcd = Utility.gcd(Math.abs(this.numerator), Math.abs(this.denominator));
+		if (gcd > 1) {
+			this.numerator = this.numerator / gcd;
+			this.denominator = this.denominator / gcd;
 		}
 	}
 	
-	public static void print1DFraction(Fraction[] f) {
-		for (int i = 0; i < f.length; i++) {
-			if (f[i] != null) {
-				System.out.printf("%d: %s\n", i, f[i]);
-			}
+	public Fraction abs() {
+		Fraction f = new Fraction(this.numerator, this.denominator);
+		if (f.numerator < 0) {
+			f.numerator *= -1;
 		}
+		return f;
 	}
 	
-	public static void printArrayList(ArrayList<Integer> list) {
-		for (int i = 0; i < list.size(); i++) {
-			System.out.printf("%d ", list.get(i));
-		}
-		System.out.println();
+	@Override
+	public String toString() {
+		return this.numerator + "/" + this.denominator;
 	}
-	
+}
+
+class Utility {
 	public static long gcd(long a, long b) {
 		if (a == 0) {
 			return b;
@@ -165,128 +211,176 @@ public class Main {
 		return a * b / gcd(a, b);
 	}
 	
-	/*
-	public static String answer(int[] xs) {
+	public static Fraction add(Fraction f1, Fraction f2) {
+		long lcm = lcm(f1.denominator, f2.denominator);
+		long newNumerator = lcm / f1.denominator * f1.numerator + lcm / f2.denominator * f2.numerator;
+		return new Fraction(newNumerator, lcm);
+	}
+	
+	public static Fraction subtract(Fraction f1, Fraction f2) {
+		long lcm = lcm(f1.denominator, f2.denominator);
+		long newNumerator = lcm / f1.denominator * f1.numerator - lcm / f2.denominator * f2.numerator;
+		return new Fraction(newNumerator, lcm);
+	}
+	
+	public static Fraction multiply(Fraction f1, Fraction f2) {
+		return new Fraction(f1.numerator * f2.numerator, f1.denominator * f2.denominator);
+	}
+	
+	public static Fraction divide(Fraction f1, Fraction f2) {
+		return new Fraction(f1.numerator * f2.denominator, f1.denominator * f2.numerator);
+	}
+	
+	public static Fraction[][] multiply(Fraction[][] map1, Fraction[][] map2) {
+		int rowLen = map1.length;
+		int colLen = map2[0].length;
+		int size = map2.length; // A stopping variable for multiplication 
 		
-		int numZero = 0;
-		int numNegative = 0;
-		int index = -1;
+		Fraction[][] newM = new Fraction[rowLen][colLen];
 		
-		for (int i = 0; i < xs.length; i++) {
-			if (xs[i] == 0) {
-				numZero++;
-			}
-			if (xs[i] < 0) {
-				numNegative++;
-				if (index == -1) {
-					index = i;
-				} else if (Math.abs(xs[i]) < Math.abs(xs[index])) {
-					index = i;
+		for (int i = 0; i < rowLen; i++) {
+			for (int j = 0; j < colLen; j++) {
+				Fraction f = new Fraction(0, 1);
+				
+				for (int k = 0; k < size; k++) {
+					Fraction ff = multiply(map1[i][k], map2[k][j]);
+					f = add(f, ff);
 				}
+				
+				newM[i][j] = f;
 			}
 		}
 		
-		if (numZero == xs.length) {
-			return "0";
-		} else if (numZero > 0 && numNegative == 1 && numNegative + numZero == xs.length) {
-			return "0";
-		} else if (numNegative == 1 && numNegative == xs.length) {
-			return new Integer(xs[0]).toString();
+		return newM;
+	}
+	
+	// -1 => f1 < f2
+	// 0  => f1 == f2
+	// 1  => f1 > f2
+	public static int compare(Fraction f1, Fraction f2) {
+		long lcm = lcm(f1.denominator, f2.denominator);
+		long f1Numerator = lcm / f1.denominator * f1.numerator;
+		long f2Numerator = lcm / f2.denominator * f2.numerator;
+		
+		if (f1Numerator < f2Numerator) {
+			return -1;
+		} else if (f1Numerator > f2Numerator) {
+			return 1;
 		} else {
-			BigInteger answer = new BigInteger("1");
-			for (int i = 0; i < xs.length; i++) {
-				if (xs[i] != 0 && !(numNegative % 2 == 1 && index == i)) {
-					answer = answer.multiply(new BigInteger(new Integer(Math.abs(xs[i])).toString()));
+			return 0;
+		}
+	}
+	
+	public static Fraction[][] inverse(Fraction[][] map) {
+		int len = map.length;
+		
+		Fraction[][] inverse = new Fraction[len][len];
+		Fraction[][] map2 = new Fraction[len][len + 1];
+		
+		for (int i = 0; i < len; i++) {
+			for (int j = 0; j < len; j++) {
+				map2[i][j] = map[i][j];
+				inverse[i][j] = new Fraction(1, 1);
+			}
+		}
+		
+		for (int i = 0; i < len; i++) {
+			// Append identity column to the end of the matrix
+			for (int j = 0; j < len; j++) {
+				if (i == j) {
+					map2[j][len] = new Fraction(1, 1);
+				} else {
+					map2[j][len] = new Fraction(0, 1);
 				}
 			}
-			return answer.toString();
+			Fraction[] inverseColumn = gauss(copy(map2));
+			for (int j = 0; j < len; j++) {
+				inverse[j][i] = inverseColumn[j];
+			}
 		}
-	}
-	*/
-	
-	
-	/*
-    public static int[] answer(int[] l, int t) {
-    	int left = 0;
-    	int right = 0;
-    	int sum = 0;
-    	int[] answer = new int[]{-1, -1};
-    	
-    	while (left < l.length) {
-    		if (sum == t) {
-    			answer[0] = left;
-    			answer[1] = right - 1;
-    			return answer;
-    		}
-    		if (sum < t && right < l.length) {
-    			sum += l[right];
-    			right++;
-    		} else {
-    			sum -= l[left];
-    			left++;
-    		}
-    	}
-    	
-    	return answer;
-    }
-    */
-}
-
-class Fraction {
-	long numerator;
-	long denominator;
-	
-	public Fraction(long n, long d) {
-		this.numerator = n;
-		this.denominator = d;
-		this.simplify();
+		
+		return inverse;
 	}
 	
-	public void simplify() {
-		long gcd = this.gcd(this.numerator, this.denominator);
-		if (gcd > 1) {
-			this.numerator = this.numerator / gcd;
-			this.denominator = this.denominator / gcd;
+	private static Fraction[] gauss(Fraction[][] map) {
+		int len = map.length;
+		
+		// Iterate through each column
+		for (int j = 0; j < len; j++) {
+			// currentRow is set to j since previous rows are already reduced as j increases.
+			int currentRow = j;
+			
+			// Find the row that contains the largest value in j-th column
+			Fraction maxVal = map[currentRow][j].abs();
+			int maxRow = currentRow;
+			for (int i = currentRow + 1; i < len; i++) {
+				if (compare(maxVal, map[i][j].abs()) < 0) {
+					maxVal = map[i][j];
+					maxRow = i;
+				}
+			}
+			
+			// Swap current row and the row that contains the largest value in the column j
+			for (int k = 0; k < len + 1; k++) {
+				Fraction temp = map[currentRow][k];
+				map[currentRow][k] = map[maxRow][k];
+				map[maxRow][k] = temp;
+			}
+			
+			// Reduce each row by using currentRow
+			for (int i = currentRow + 1; i < len; i++) {
+				Fraction ratio = divide(map[i][j], map[currentRow][j]);
+				for (int k = 0; k < len + 1; k++) {
+					if (k == j) {
+						map[i][k] = new Fraction(0, 1);
+					} else {
+						Fraction f = multiply(map[currentRow][k], ratio);
+						f = subtract(f, map[i][k]);
+						map[i][k] = f;
+					}
+				}
+			}
 		}
-	}
-	
-	public void multiply(Fraction f) {
-		this.numerator *= f.numerator;
-		this.denominator *= f.denominator;
-		this.simplify();
-	}
-	
-	// Calculate sum of unlimited ratio series
-	public void calculateForLoop() {
-		long n = this.numerator;
-		long d = this.denominator;
-		this.numerator = d;
-		this.denominator = d - n;
-		this.simplify();
-	}
-	
-	public void add(Fraction f) {
-		long commonDenominator = lcm(this.denominator, f.denominator);
-		long a = this.numerator * (commonDenominator / this.denominator);
-		long b = f.numerator * (commonDenominator / f.denominator);
-		this.numerator = a + b;
-		this.denominator = commonDenominator;
-		this.simplify();
-	}
-	
-	private long gcd(long a, long b) {
-		if (a == 0) {
-			return b;
+		
+		Fraction[] answer = new Fraction[len];
+		// Iterate rows from the bottom, and compute ax = b
+		for (int i = len - 1; i >= 0; i--) {
+			int currentColumn = i;
+			
+			answer[i] = divide(map[i][len], map[i][currentColumn]);
+			int row = i - 1;
+			while (row >= 0) {
+				// Take acount the result of the answer for currentColumn
+				Fraction f = multiply(map[row][currentColumn], answer[i]);
+				f = subtract(map[row][len], f);
+				map[row][len] = f;
+				row--;
+			}
 		}
-		return gcd(b % a, a);
+		
+		return answer;
 	}
 	
-	public long lcm(long a, long b) {
-		return a * b / gcd(a, b);
+	private static Fraction[][] copy(Fraction[][] map) {
+		int rowLen = map.length;
+		int colLen = map[0].length;
+		Fraction[][] map2 = new Fraction[rowLen][colLen];
+		
+		for (int i = 0; i < rowLen; i++) {
+			for (int j = 0; j < colLen; j++) {
+				map2[i][j] = new Fraction(map[i][j].numerator, map[i][j].denominator);
+			}
+		}
+		
+		return map2;
 	}
-
-	@Override
-	public String toString() {
-		return this.numerator + "/" + this.denominator;
+	
+	public static void print2DFraction(Fraction[][] f) {
+		for (int i = 0; i < f.length; i++) {
+			for (int j = 0; j < f[i].length; j++) {
+				System.out.printf("%s ", f[i][j]);
+			}
+			System.out.println();
+		}
 	}
 }
