@@ -9,40 +9,41 @@ public class Main {
 		Scanner in = new Scanner(System.in);
 
 		int N = in.nextInt();
-		int[] A = new int[N];
-		int[] B = new int[N];
-		int[] C = new int[N];
+		
+		ArrayList<Integer> A = new ArrayList<Integer>();
+		ArrayList<Integer> B = new ArrayList<Integer>();
+		ArrayList<Integer> C = new ArrayList<Integer>();
 		
 		TreeSet<Integer> aSet = new TreeSet<Integer>();
 		TreeSet<Integer> bSet = new TreeSet<Integer>();
 		TreeSet<Integer> cSet = new TreeSet<Integer>();
 		
 		for (int i = 0; i < N; i++) {
-			A[i] = in.nextInt();
-			aSet.add(A[i]);
+			int n = in.nextInt();
+			A.add(n);
 		}
 		for (int i = 0; i < N; i++) {
-			B[i] = in.nextInt();
-			bSet.add(B[i]);
+			int n = in.nextInt();
+			B.add(n);
+			bSet.add(n);
 		}
 		for (int i = 0; i < N; i++) {
-			C[i] = in.nextInt();
-			cSet.add(C[i]);
+			int n = in.nextInt();
+			C.add(n);
+			cSet.add(n);
 		}
 		
-		Arrays.sort(A);
-		Arrays.sort(B);
-		Arrays.sort(C);
+		A.sort(null);
+		B.sort(null);
+		C.sort(null);
 		
 		long[] temp = new long[N];
 		for (int i = 0; i < N; i++) {
-			Integer c = cSet.higher(B[i]);
+			Integer c = cSet.higher(B.get(i));
 			
 			if (c != null) {
-				int index = binarySearch2(C, c);
+				int index = binarySearch3(C, c);
 				temp[i] = (N - index);
-			} else {
-				temp[i] = 0;
 			}
 		}
 		
@@ -51,11 +52,11 @@ public class Main {
 		}
 		
 		long answer = 0;
-		for (int i = 0; i < N; i++) {
-			Integer b = bSet.higher(A[i]);
+		for (int i = 0; i < A.size(); i++) {
+			Integer b = bSet.higher(A.get(i));
 			
 			if (b != null) {
-				int index = binarySearch2(B, b);
+				int index = binarySearch3(B, b);
 				answer += temp[index];
 			}
 		}
@@ -90,6 +91,24 @@ public class Main {
 			if (arr[mid] == n && (mid == 0 || (mid > 0 && arr[mid - 1] != arr[mid]))) {
 				return mid;
 			} else if (arr[mid] < n) {
+				low = mid + 1;
+			} else {
+				high = mid - 1;
+			}
+		}
+		return -1;
+	}
+	
+	public static int binarySearch3(ArrayList<Integer> arr, int n) {
+		int low = 0;
+		int high = arr.size() - 1;
+		
+		while (low <= high) {
+			int mid = (low + high) / 2;
+			
+			if (arr.get(mid) == n && (mid == 0 || (mid > 0 && !arr.get(mid - 1).equals(arr.get(mid))))) {
+				return mid;
+			} else if (arr.get(mid) < n) {
 				low = mid + 1;
 			} else {
 				high = mid - 1;
