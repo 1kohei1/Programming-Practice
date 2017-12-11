@@ -1,47 +1,71 @@
 import java.util.*;
 
-// ABC 80-C
-// https://beta.atcoder.jp/contests/abc080/tasks/abc080_c
+// ARC 86-D
+// https://beta.atcoder.jp/contests/arc086/tasks/arc086_b
 
 public class Main {
 
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
-
+		
 		int N = in.nextInt();
+		long[] nums = new long[N];
 		
-		int[][] stores = new int[N][11];
+		int minIndex = 0;
+		int maxIndex = 0;
+		
 		for (int i = 0; i < N; i++) {
-			for (int j = 0; j < 10; j++) {
-				stores[i][j] = in.nextInt();
+			nums[i] = in.nextLong();
+			if (nums[minIndex] > nums[i]) {
+				minIndex = i;
+			}
+			if (nums[maxIndex] < nums[i]) {
+				maxIndex = i;
 			}
 		}
 		
-		int[][] points = new int[N][11];
-		for (int i = 0; i < N; i++) {
-			for (int j = 0; j < 11; j++) {
-				points[i][j] = in.nextInt();
-			}
+		int useIndex = -1;
+		boolean isNegative = false;
+		
+		if (Math.abs(nums[minIndex]) < Math.abs(nums[maxIndex])) {
+			useIndex = maxIndex;
+		} else {
+			useIndex = minIndex;
+		}
+
+		if (nums[useIndex] < 0) {
+			isNegative = true;
 		}
 		
-		long answer = Long.MIN_VALUE;
+		ArrayList<Integer> arr = new ArrayList<Integer>();
 		
-		// Try all patterns
-		for (int i = 1; i < (1 << 10); i++) {
-			long n = 0;
-			// Go through stores
-			for (int j = 0; j < N; j++) {
-				int numOverlappings = 0;
-				// Check if there is overlapping
-				for (int k = 0; k <= 9; k++) {
-					if ((i & (1 << k)) > 0 && stores[j][k] == 1) {
-						numOverlappings++;
-					}
+		if (isNegative) {
+			for (int i = N - 1; i >= 1; i--) {
+				while (nums[i - 1] > nums[i]) {
+					nums[i - 1] += nums[useIndex];
+					arr.add(useIndex + 1);
+					arr.add(i - 1 + 1);
 				}
-				n += points[j][numOverlappings];
+				if (nums[i - 1] < nums[useIndex]) {
+					useIndex = i - 1;
+				}
 			}
-			answer = Math.max(answer, n);
+		} else {
+			for (int i = 0; i < N - 1; i++) {
+				while (nums[i] > nums[i + 1]) {
+					nums[i + 1] += nums[useIndex];
+					arr.add(useIndex + 1);
+					arr.add(i + 1 + 1);
+				}
+				if (nums[useIndex] < nums[i + 1]) {
+					useIndex = i + 1;
+				}
+			}
 		}
-		System.out.println(answer);
+		
+		System.out.println(arr.size() / 2);
+		for (int i = 0; i < arr.size(); i += 2) {
+			System.out.printf("%d %d\n", arr.get(i), arr.get(i + 1));
+		}
 	}
 }
