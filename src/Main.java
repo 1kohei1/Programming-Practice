@@ -1,7 +1,7 @@
 import java.util.*;
 
-// ABC 64-C
-// https://beta.atcoder.jp/contests/abc064/tasks/abc064_c
+// ABC 70-C
+// https://beta.atcoder.jp/contests/abc070/tasks/abc070_c
 
 public class Main {
 
@@ -9,31 +9,24 @@ public class Main {
 		Scanner in = new Scanner(System.in);
 		
 		int N = in.nextInt();
-		int[] nums = new int[9];
+		long answer = 1;
 		
 		for (int i = 0; i < N; i++) {
-			int a = in.nextInt();
-			if (a >= 3200) {
-				nums[8]++;
-			} else {
-				nums[a / 400]++;
-			}
+			long n = in.nextLong();
+			answer = lcm(answer, n);
 		}
-		
-		int count = 0;
-		for (int i = 0; i < 8; i++) {
-			if (nums[i] > 0) {
-				count++;
-			}
+		System.out.println(answer);
+	}
+	
+	public static long lcm(long a, long b) {
+		long gcd = gcd(a, b);
+		return gcd * (a / gcd) * (b / gcd);
+	}
+	
+	public static long gcd(long a, long b) {
+		if (a == 0) {
+			return b;
 		}
-		int min = count;
-		int max = count;
-		if (min == 0) {
-			min = 1;
-		}
-		if (nums[8] > 0) {
-			max = count + nums[8];
-		}
-		System.out.printf("%d %d\n", min, max);
+		return gcd(b % a, a);
 	}
 }
