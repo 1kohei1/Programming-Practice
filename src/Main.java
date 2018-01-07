@@ -1,7 +1,7 @@
 import java.util.*;
 
-// ABC 70-C
-// https://beta.atcoder.jp/contests/abc070/tasks/abc070_c
+// ABC 85-D
+// https://beta.atcoder.jp/contests/abc085/tasks/abc085_d
 
 public class Main {
 
@@ -9,24 +9,52 @@ public class Main {
 		Scanner in = new Scanner(System.in);
 		
 		int N = in.nextInt();
-		long answer = 1;
+		int H = in.nextInt();
+		
+		long[] swingD = new long[N];
+		long[] throwD = new long[N];
+		long maxSwingD = 0;
+		int maxSwingDIndex = 0;
 		
 		for (int i = 0; i < N; i++) {
-			long n = in.nextLong();
-			answer = lcm(answer, n);
+			long sd = in.nextLong();
+			long td = in.nextLong();
+			
+			if (maxSwingD < sd) {
+				maxSwingD = sd;
+				maxSwingDIndex = i;
+			}
+			
+			swingD[i] = sd;
+			throwD[i] = td;
+		}
+
+		ArrayList<Long> nums = new ArrayList<Long>();
+		for (int i = 0; i < N; i++) {
+			if (maxSwingD <= throwD[i]) {
+				nums.add(throwD[i]);
+			}
+		}
+		nums.sort(null);
+		
+		long answer = 0;
+		for (int i = nums.size() - 1; i >= 0; i--) {
+			H -= nums.get(i);
+			answer++;
+			if (H <= 0) {
+				break;
+			}
+		}
+		
+		if (H <= 0) {
+			System.out.println(answer);
+			return;
+		}
+		
+		answer += H / maxSwingD;
+		if (H % maxSwingD != 0) {
+			answer++;
 		}
 		System.out.println(answer);
-	}
-	
-	public static long lcm(long a, long b) {
-		long gcd = gcd(a, b);
-		return gcd * (a / gcd) * (b / gcd);
-	}
-	
-	public static long gcd(long a, long b) {
-		if (a == 0) {
-			return b;
-		}
-		return gcd(b % a, a);
 	}
 }
