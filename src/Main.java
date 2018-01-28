@@ -1,60 +1,96 @@
 import java.util.*;
 
-// ABC 85-D
-// https://beta.atcoder.jp/contests/abc085/tasks/abc085_d
+// ARC 90-D
+// https://beta.atcoder.jp/contests/arc090/tasks/arc090_b
 
 public class Main {
 
+	static int N;
+	static HashMap<Integer, HashMap<Integer, Integer>> edges;
+	static int[] values;
+	static boolean[] visited;
+	
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
-		
-		int N = in.nextInt();
-		int H = in.nextInt();
-		
-		long[] swingD = new long[N];
-		long[] throwD = new long[N];
-		long maxSwingD = 0;
-		int maxSwingDIndex = 0;
-		
-		for (int i = 0; i < N; i++) {
-			long sd = in.nextLong();
-			long td = in.nextLong();
-			
-			if (maxSwingD < sd) {
-				maxSwingD = sd;
-				maxSwingDIndex = i;
-			}
-			
-			swingD[i] = sd;
-			throwD[i] = td;
-		}
 
-		ArrayList<Long> nums = new ArrayList<Long>();
-		for (int i = 0; i < N; i++) {
-			if (maxSwingD <= throwD[i]) {
-				nums.add(throwD[i]);
+		N = in.nextInt();
+		int M = in.nextInt();
+		
+		edges = new HashMap<Integer, HashMap<Integer, Integer>>();
+		Input[] inputs = new Input[M];
+		
+		for (int i = 0; i < M; i++) {
+			int l = in.nextInt();
+			int r = in.nextInt();
+			int c = in.nextInt();
+			
+			if (edges.containsKey(l)) {
+				HashMap<Integer, Integer> e = edges.get(l);
+				e.put(r, c);
+			} else {
+				HashMap<Integer, Integer> e = new HashMap<Integer, Integer>();
+				e.put(r, c);
+				edges.put(l, e);
+			}
+			
+			if (edges.containsKey(r)) {
+				HashMap<Integer, Integer> e = edges.get(r);
+				e.put(l, -1 * c);
+			} else {
+				HashMap<Integer, Integer> e = new HashMap<Integer, Integer>();
+				e.put(l, -1 * c);
+				edges.put(r, e);
+			}
+			
+			inputs[i] = new Input(l, r, c);
+		}
+		
+		values = new int[N + 1];
+		visited = new boolean[N + 1];
+		
+		for (int i = 1; i < N + 1; i++) {
+			if (visited[i] == false) {
+				dfs(i, 0);
 			}
 		}
-		nums.sort(null);
 		
-		long answer = 0;
-		for (int i = nums.size() - 1; i >= 0; i--) {
-			H -= nums.get(i);
-			answer++;
-			if (H <= 0) {
-				break;
+		boolean answer = true;
+		
+		for (int i = 0; i < M && answer; i++) {
+			if (values[inputs[i].l] + inputs[i].c != values[inputs[i].r]) {
+				answer = false;
 			}
 		}
 		
-		if (H <= 0) {
-			System.out.println(answer);
+		System.out.println(answer ? "Yes" : "No");
+	}
+	
+	public static void dfs(int n, int val) {
+		visited[n] = true;
+		values[n] = val;
+		
+		HashMap<Integer, Integer> e = edges.get(n);
+		
+		if (e == null) {
 			return;
 		}
 		
-		answer += H / maxSwingD;
-		if (H % maxSwingD != 0) {
-			answer++;
+		for (int next : e.keySet()) {
+			if (visited[next] == false) {
+				dfs(next, val + e.get(next));
+			}
 		}
-		System.out.println(answer);
+	}
+}
+
+class Input {
+	int l;
+	int r;
+	int c;
+	
+	public Input(int l, int r, int c) {
+		this.l = l;
+		this.r = r;
+		this.c = c;
 	}
 }
