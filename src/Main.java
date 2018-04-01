@@ -1,57 +1,60 @@
 import java.util.*;
 
-// AGC 22-A
-// https://beta.atcoder.jp/contests/agc022
+// ABC 76-C
+// https://beta.atcoder.jp/contests/abc076/tasks/abc076_c
 
 public class Main {
 	
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
 
-		String s = in.next();
+		char[] S = in.next().toCharArray();
+		char[] T = in.next().toCharArray();
 		
-		if (s.equals("zyxwvutsrqponmlkjihgfedcba")) {
-			System.out.println(-1);
-		} else {
-			int[] count = new int[26];
-			for (int i = 0; i < s.length(); i++) {
-				count[s.charAt(i) - 'a'] += 1;
+		ArrayList<String> answers = new ArrayList<String>();
+		
+		for (int i = 0; i < S.length; i++) {
+			if (i + T.length > S.length) {
+				continue;
 			}
 			
-			int index = -1;
-			for (int i = 0; i < count.length; i++) {
-				if (count[i] == 0) {
-					index = i;
-					break;
+			char[] answer = S.clone();
+			
+			for (int j = 0; j < i; j++) {
+				if (answer[j] == '?') {
+					answer[j] = 'a';
 				}
 			}
 			
-			if (index >= 0) {
-				System.out.printf("%s%c\n", s, index + 'a');
-			} else {
-				count = new int[26];
-				int stringTill = 0;
-				char tailingCharacter = ' ';
-				boolean answerFound = false;
-
-				for (int i = s.length() - 1; i >= 0 && !answerFound; i--) {
-					int cindex = s.charAt(i) - 'a';
-					for (int j = cindex + 1; j < 26; j++) {
-						if (count[j] > 0) {
-							tailingCharacter = (char) (j + 'a');
-							stringTill = i;
-							answerFound = true;
-							break;
-						}
-					}
-					count[cindex] += 1;
-				}
+			boolean isAnswer = true;
+			
+			for (int j = 0; j < T.length; j++) {
+				int index = i + j;
 				
-				for (int i = 0; i < stringTill; i++) {
-					System.out.printf("%c", s.charAt(i));
+				if (answer[index] == '?' || answer[index] == T[j]) {
+					answer[index] = T[j];
+				} else {
+					isAnswer = false;
 				}
-				System.out.printf("%c\n", tailingCharacter);
 			}
+			
+			for (int j = i + T.length; j < S.length; j++) {
+				if (answer[j] == '?') {
+					answer[j] = 'a';
+				}
+			}
+			
+			if (isAnswer) {
+				answers.add(new String(answer));
+			}
+		}
+		
+		answers.sort(null);
+		
+		if (answers.size() > 0) {
+			System.out.println(answers.get(0));
+		} else {
+			System.out.println("UNRESTORABLE");
 		}
 	}
 }
