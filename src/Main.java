@@ -1,52 +1,57 @@
 import java.util.*;
 
-// ARC 93-D
-// https://beta.atcoder.jp/contests/arc093/tasks/arc093_b
+// AGC 22-A
+// https://beta.atcoder.jp/contests/agc022
 
 public class Main {
 	
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
+
+		String s = in.next();
 		
-		int numWhite = in.nextInt();
-		int numBlack = in.nextInt();
-		
-		char WHITE = '.';
-		char BLACK = '#';
-		
-		char[][] map = new char[100][100];
-		
-		for (int i = 0; i < 100; i++) {
-			for (int j = 0; j < 100; j++) {
-				// Left half is white and right half is black
-				map[i][j] = j <= 49 ? WHITE : BLACK;
+		if (s.equals("zyxwvutsrqponmlkjihgfedcba")) {
+			System.out.println(-1);
+		} else {
+			int[] count = new int[26];
+			for (int i = 0; i < s.length(); i++) {
+				count[s.charAt(i) - 'a'] += 1;
 			}
-		}
-		
-		int count = 1;
-		// Fill black in white canvas
-		for (int i = 0; i < 100; i += 2) {
-			for (int j = 0; j <= 49 && count < numBlack; j += 2) {
-				map[i][j] = BLACK;
-				count++;
+			
+			int index = -1;
+			for (int i = 0; i < count.length; i++) {
+				if (count[i] == 0) {
+					index = i;
+					break;
+				}
 			}
-		}
-		
-		count = 1;
-		// Fill white in black canvas
-		for (int i = 0; i < 100; i += 2) {
-			for (int j = 51; j < 100 && count < numWhite; j += 2) {
-				map[i][j] = WHITE;
-				count++;
+			
+			if (index >= 0) {
+				System.out.printf("%s%c\n", s, index + 'a');
+			} else {
+				count = new int[26];
+				int stringTill = 0;
+				char tailingCharacter = ' ';
+				boolean answerFound = false;
+
+				for (int i = s.length() - 1; i >= 0 && !answerFound; i--) {
+					int cindex = s.charAt(i) - 'a';
+					for (int j = cindex + 1; j < 26; j++) {
+						if (count[j] > 0) {
+							tailingCharacter = (char) (j + 'a');
+							stringTill = i;
+							answerFound = true;
+							break;
+						}
+					}
+					count[cindex] += 1;
+				}
+				
+				for (int i = 0; i < stringTill; i++) {
+					System.out.printf("%c", s.charAt(i));
+				}
+				System.out.printf("%c\n", tailingCharacter);
 			}
-		}
-		
-		System.out.println("100 100");
-		for (int i = 0; i < 100; i++) {
-			for (int j = 0; j < 100; j++) {
-				System.out.printf("%c", map[i][j]);
-			}
-			System.out.println();
 		}
 	}
 }
