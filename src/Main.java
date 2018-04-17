@@ -1,7 +1,7 @@
 import java.util.*;
 
-// ARC 95-D
-// https://beta.atcoder.jp/contests/arc095/tasks/arc095_b
+// ABC 64-D
+// https://beta.atcoder.jp/contests/abc064/tasks/abc064_d
 
 public class Main {
 
@@ -9,23 +9,32 @@ public class Main {
 		Scanner in = new Scanner(System.in);
 
 		int N = in.nextInt();
-
-		int[] nums = new int[N];
-		for (int i = 0; i < N; i++) {
-			nums[i] = in.nextInt();
-		}
+		char[] c = in.next().toCharArray();
 		
-		Arrays.sort(nums);
-	
-		int n = nums[N - 1];
-		int r = nums[0];
+		int pre = 0;
+		int post = 0;
+		int cur = 0;
 		
-		for (int i = 1; i < N; i++) {
-			if (Math.abs(nums[i] - n / 2.0) < Math.abs(r - n / 2.0)) {
-				r = nums[i];
+		for (int i = 0; i < c.length; i++) {
+			if (c[i] == '(') {
+				cur++;
+			} else if (cur > 0) {
+				cur--;
+			} else {
+				pre++;
 			}
 		}
+		post = cur;
 		
-		System.out.printf("%d %d\n", n, r);
+		for (int i = 0; i < pre; i++) {
+			System.out.printf("(");
+		}
+		for (int i = 0; i < c.length; i++) {
+			System.out.print(c[i]);
+		}
+		for (int i = 0; i < post; i++) {
+			System.out.print(')');
+		}
+		System.out.println();
 	}
 }
