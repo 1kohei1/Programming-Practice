@@ -1,40 +1,23 @@
 import java.util.*;
 
-// ABC 64-D
-// https://beta.atcoder.jp/contests/abc064/tasks/abc064_d
+// ARC 96-D
+// https://beta.atcoder.jp/contests/arc096/tasks/arc096_a
 
 public class Main {
 
 	public static void main(String[] args) {
 		Scanner in = new Scanner(System.in);
 
-		int N = in.nextInt();
-		char[] c = in.next().toCharArray();
+		long A = in.nextInt();
+		long B = in.nextInt();
+		long C = in.nextInt();
+		long X = in.nextInt();
+		long Y = in.nextInt();
 		
-		int pre = 0;
-		int post = 0;
-		int cur = 0;
+		long a = A * X + B * Y;
+		long b = Math.min(X, Y) * 2 * C + (X - Math.min(X, Y)) * A + (Y - Math.min(X, Y)) * B;
+		long c = Math.max(X, Y) * 2 * C;
 		
-		for (int i = 0; i < c.length; i++) {
-			if (c[i] == '(') {
-				cur++;
-			} else if (cur > 0) {
-				cur--;
-			} else {
-				pre++;
-			}
-		}
-		post = cur;
-		
-		for (int i = 0; i < pre; i++) {
-			System.out.printf("(");
-		}
-		for (int i = 0; i < c.length; i++) {
-			System.out.print(c[i]);
-		}
-		for (int i = 0; i < post; i++) {
-			System.out.print(')');
-		}
-		System.out.println();
+		System.out.println(Math.min(Math.min(a, b), c));
 	}
 }
