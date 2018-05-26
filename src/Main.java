@@ -1,7 +1,7 @@
 import java.util.*;
 
-// ARC 98-C
-// https://beta.atcoder.jp/contests/arc098/tasks/arc098_a
+// ARC 98-D
+// https://beta.atcoder.jp/contests/arc098/tasks/arc098_b
 
 public class Main {
 
@@ -9,55 +9,36 @@ public class Main {
 		Scanner in = new Scanner(System.in);
 
 		int N = in.nextInt();
-		char[] c = in.next().toCharArray();
-		
-		int[][] arr1 = new int[N][2];
-		int[][] arr2 = new int[N][2];
+		long[] arr = new long[N];
 		
 		for (int i = 0; i < N; i++) {
-			if (c[i] == 'W') {
-				if (i == 0) {
-					arr1[i][0]++;	
-				} else {
-					arr1[i][0] = arr1[i - 1][0] + 1;
-					arr1[i][1] = arr1[i - 1][1];
-				}
+			arr[i] = in.nextLong();
+		}
+		
+		long answer = 0;
+		long temp = 0;
+		int left = 0;
+		int right = 0;
+		
+		while (left < N) {
+			if (left == right) {
+				temp = arr[right];
+				answer++;
+				right++;
+			} else if (right < N && (temp & arr[right]) == 0) {
+				temp += arr[right];
+				answer++;
+				right++;
 			} else {
-				if (i == 0) {
-					arr1[i][1]++;	
-				} else {
-					arr1[i][0] = arr1[i - 1][0];
-					arr1[i][1] = arr1[i - 1][1] + 1;
-				}
+				temp -= arr[left];
+				left++;
+//				int num = right - left;
+//				answer += num * (num - 1) / 2;
+				answer += right - left;
 			}
 		}
 		
-		for (int i = N - 1; i >= 0; i--) {
-			if (c[i] == 'W') {
-				if (i == N - 1) {
-					arr2[i][0]++;
-				} else {
-					arr2[i][0] = arr2[i + 1][0] + 1;
-					arr2[i][1] = arr2[i + 1][1]; 
-				}
-			} else {
-				if (i == N - 1) {
-					arr2[i][1]++;
-				} else {
-					arr2[i][0] = arr2[i + 1][0];
-					arr2[i][1] = arr2[i + 1][1] + 1; 
-				}
-			}
-		}
-		
-		int answer = N;
-		
-		for (int i = 0; i < N; i++) {
-			int left = i == 0 ? 0 : arr1[i - 1][0];
-			int right = i == N - 1 ? 0 : arr2[i + 1][1];
-			
-			answer = Math.min(answer, left + right);
-		}
+//		answer += N;
 		
 		System.out.println(answer);
 	}
