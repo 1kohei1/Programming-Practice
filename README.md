@@ -1,1 +1,6 @@
-This is all source code I wrote to get in UCF programming varsity team
+One commit represents a solution to one problem availabe online.
+
+ARC => atcoder regular contest
+ABC => atcoder beginner contest
+
+The number represents which contest it is, and the alphabet represents which problem the solution is for. 
